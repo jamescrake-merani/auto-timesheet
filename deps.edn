@@ -1,6 +1,7 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.12.4"}
-        com.layerware/hugsql {:mvn/version "0.5.3"}}
+        com.layerware/hugsql {:mvn/version "0.5.3"}
+        org.xerial/sqlite-jdbc {:mvn/version "3.51.2.0"}}
  :aliases
  {:run-m {:main-opts ["-m" "jamescrake-merani.auto-timesheet"]}
   :run-x {:ns-default jamescrake-merani.auto-timesheet
