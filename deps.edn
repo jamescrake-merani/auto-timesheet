@@ -1,5 +1,6 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.12.4"}}
+ :deps {org.clojure/clojure {:mvn/version "1.12.4"}
+        com.layerware/hugsql {:mvn/version "0.5.3"}}
  :aliases
  {:run-m {:main-opts ["-m" "jamescrake-merani.auto-timesheet"]}
   :run-x {:ns-default jamescrake-merani.auto-timesheet
