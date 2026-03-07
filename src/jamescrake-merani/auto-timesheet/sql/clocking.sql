@@ -4,8 +4,8 @@
 create table clockin(
     clockinid    integer auto_increment primary key,
     timestamp     datetime not null,
-    clockoutid  integer,
-    categoryid integer,
+    clockoutid  integer not null,
+    categoryid integer not null,
     foreign key(clockoutid) references clockout(clockoutid),
     foreign key(categoryid) references category(categoryid) 
 )
