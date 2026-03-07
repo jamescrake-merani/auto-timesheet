@@ -3,7 +3,7 @@
 -- :result :raw
 create table clockin(
     clockinid    integer auto_increment primary key,
-    timestamp     datetime,
+    timestamp     datetime not null,
     clockoutid  integer,
     categoryid integer,
     foreign key(clockoutid) references clockout(clockoutid),
@@ -15,7 +15,7 @@ create table clockin(
 -- :result :raw
 create table clockout(
     clockoutid     integer auto_increment primary key,
-    timestamp      datetime,
+    timestamp      datetime not null,
 )
 
 -- :name create-category-table
@@ -23,5 +23,5 @@ create table clockout(
 -- :result :raw
 create table category(
     categoryid  integer auto_increment primary key,
-    name        text
+    name        text not null
 )
