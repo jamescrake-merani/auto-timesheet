@@ -8,7 +8,7 @@ create table clockin(
     categoryid integer not null,
     foreign key(clockoutid) references clockout(clockoutid),
     foreign key(categoryid) references category(categoryid) 
-)
+);
 
 -- :name create-clock-out-table
 -- :command :execute
@@ -16,7 +16,7 @@ create table clockin(
 create table clockout(
     clockoutid     integer auto_increment primary key,
     timestamp      datetime not null,
-)
+);
 
 -- :name create-category-table
 -- :command :execute
@@ -24,4 +24,4 @@ create table clockout(
 create table category(
     categoryid  integer auto_increment primary key,
     name        text not null
-)
+);
