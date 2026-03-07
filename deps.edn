@@ -4,7 +4,7 @@
         com.layerware/hugsql-adapter-next-jdbc {:mvn/version "0.5.3"}
         org.xerial/sqlite-jdbc {:mvn/version "3.51.2.0"}
         seancorfield/next.jdbc {:mvn/version "1.2.659"}
-        dev.dirs/directories {mvn/version "26"}}
+        dev.dirs/directories {:mvn/version "26"}}
  :aliases
  {:run-m {:main-opts ["-m" "jamescrake-merani.auto-timesheet"]}
   :run-x {:ns-default jamescrake-merani.auto-timesheet
