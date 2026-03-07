@@ -11,4 +11,6 @@
 
 (defn open-database [db-path]
   (h/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
-  (jdbc/get-datasource {:dbtype "sqlite" :dbname db-path}))
+  (let [ds (jdbc/get-datasource {:dbtype "sqlite" :dbname db-path})]
+    (init-database ds)
+    ds))
