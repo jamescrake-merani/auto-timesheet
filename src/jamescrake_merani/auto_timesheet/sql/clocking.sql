@@ -1,7 +1,7 @@
 -- :name create-clock-in-table
 -- :command :execute
 -- :result :raw
-create table clockin(
+create table if not exists clockin(
     clockinid    integer auto_increment primary key,
     timestamp     datetime not null,
     clockoutid  integer not null,
@@ -13,7 +13,7 @@ create table clockin(
 -- :name create-clock-out-table
 -- :command :execute
 -- :result :raw
-create table clockout(
+create table if not exists clockout(
     clockoutid     integer auto_increment primary key,
     timestamp      datetime not null,
 );
@@ -21,7 +21,7 @@ create table clockout(
 -- :name create-category-table
 -- :command :execute
 -- :result :raw
-create table category(
+create table if not exists category(
     categoryid  integer auto_increment primary key,
     name        text not null
 );
