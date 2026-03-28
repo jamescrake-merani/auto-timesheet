@@ -7,3 +7,7 @@
 
 (def db (db-init/open-database (io/file (.dataDir proj-dirs) "data.db")))
 
+;; Create all the tables in the database if they haven't already been created.
+(comment
+  (db-init/init-database db))
+
