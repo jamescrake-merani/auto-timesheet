@@ -31,3 +31,7 @@ create table if not exists category(
 -- :result :raw
 insert into clockin (categoryid)
 values (:category-id);
+
+-- :name get-category-from-name :? :1
+select categoryid from category
+where :name = name
