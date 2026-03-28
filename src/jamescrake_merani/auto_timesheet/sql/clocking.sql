@@ -2,7 +2,7 @@
 -- :command :execute
 -- :result :raw
 create table if not exists clockin(
-    clockinid    integer auto_increment primary key,
+    clockinid    integer autoincrement primary key,
     timestamp     datetime not null default current_timestamp,
     clockoutid  integer,
     categoryid integer not null,
@@ -14,7 +14,7 @@ create table if not exists clockin(
 -- :command :execute
 -- :result :raw
 create table if not exists clockout(
-    clockoutid     integer auto_increment primary key,
+    clockoutid     integer autoincrement primary key,
     timestamp      datetime not null
 );
 
@@ -22,7 +22,7 @@ create table if not exists clockout(
 -- :command :execute
 -- :result :raw
 create table if not exists category(
-    categoryid  integer auto_increment primary key,
+    categoryid  integer autoincrement primary key,
     name        text not null
 );
 
