@@ -25,3 +25,9 @@ create table if not exists category(
     categoryid  integer auto_increment primary key,
     name        text not null
 );
+
+-- :name clock-in
+-- :command :execute
+-- :result :raw
+insert into clockin (categoryid)
+values (:category-id)
