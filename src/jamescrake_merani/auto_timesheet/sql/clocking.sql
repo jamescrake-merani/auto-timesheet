@@ -30,4 +30,4 @@ create table if not exists category(
 -- :command :execute
 -- :result :raw
 insert into clockin (categoryid)
-values (:category-id)
+values (:category-id);
