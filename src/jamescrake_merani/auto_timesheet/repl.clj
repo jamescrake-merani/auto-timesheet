@@ -1,5 +1,6 @@
 (ns jamescrake-merani.auto-timesheet.repl
   (:require [jamescrake-merani.auto-timesheet.db-init :as db-init]
+            [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io])
   (:import (dev.dirs ProjectDirectories)))
 
@@ -10,4 +11,9 @@
 ;; Create all the tables in the database if they haven't already been created.
 (comment
   (db-init/init-database db))
+
+;; Make a clock in
+(comment
+  (as-db/clock-in db {:category-id 2}))
+
 
