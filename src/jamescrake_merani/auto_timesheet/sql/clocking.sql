@@ -3,7 +3,7 @@
 -- :result :raw
 create table if not exists clockin(
     clockinid    integer auto_increment primary key,
-    timestamp     datetime not null,
+    timestamp     datetime not null default current_timestamp,
     clockoutid  integer not null,
     categoryid integer not null,
     foreign key(clockoutid) references clockout(clockoutid),
