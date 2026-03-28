@@ -35,3 +35,9 @@ values (:category-id);
 -- :name get-category-from-name :? :1
 select categoryid from category
 where :name = name
+
+-- :name create-category
+-- :command :execute
+-- :result :raw
+insert into category (name)
+values (:name);
