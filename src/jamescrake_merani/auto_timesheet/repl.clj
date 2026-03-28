@@ -1,6 +1,7 @@
 (ns jamescrake-merani.auto-timesheet.repl
   (:require [jamescrake-merani.auto-timesheet.db-init :as db-init]
             [jamescrake-merani.auto-timesheet.db :as as-db]
+            [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
             [clojure.java.io :as io])
   (:import (dev.dirs ProjectDirectories)))
 
@@ -15,5 +16,10 @@
 ;; Make a clock in
 (comment
   (as-db/clock-in db {:category-id 2}))
+
+;; Try clocking in.
+(comment
+  (helpers/clock-in "work")
+  )
 
 
