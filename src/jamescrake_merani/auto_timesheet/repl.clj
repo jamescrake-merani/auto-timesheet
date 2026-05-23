@@ -19,7 +19,6 @@
 
 ;; Try clocking in.
 (comment
-  (helpers/clock-in db "work")
-  )
+  (helpers/clock-in db "work"))
 
 
