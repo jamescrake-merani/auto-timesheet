@@ -40,4 +40,5 @@ where :name = name;
 -- :command :execute
 -- :result :raw
 insert into category (name)
-values (:name);
+values (:name)
+returning categoryid;
