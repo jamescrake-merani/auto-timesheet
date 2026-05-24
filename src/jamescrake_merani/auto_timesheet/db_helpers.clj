@@ -14,5 +14,6 @@
 
 (defn clock-out
   ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid)))
-  ([db clockin-id] (as-db/clock-out db {:clockinid clockin-id})))
+  ([db clockin-id] (as-db/attach-clock-out db {:clockinid clockin-id
+                                               :clockoutid (as-db/clock-out db)})))
 
