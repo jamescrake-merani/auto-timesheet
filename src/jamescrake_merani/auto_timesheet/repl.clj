@@ -25,4 +25,7 @@
 (comment
   (helpers/clock-in db "work"))
 
+(comment
+  (as-db/hanging-clockins db))
+
 
