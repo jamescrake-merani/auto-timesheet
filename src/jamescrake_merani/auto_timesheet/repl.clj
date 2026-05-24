@@ -17,6 +17,10 @@
 (comment
   (as-db/clock-in db {:category-id 2}))
 
+;; Find category
+(comment
+  (as-db/get-category-from-name {:name "test"}))
+
 ;; Try clocking in.
 (comment
   (helpers/clock-in db "work"))
