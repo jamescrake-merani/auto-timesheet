@@ -32,6 +32,12 @@ create table if not exists category(
 insert into clockin (categoryid)
 values (:category-id);
 
+-- :name hanging-clockins
+-- :command :execute
+-- :result :one
+select * from clockin
+where clockoutid is null;
+
 -- :name get-category-from-name :? :1
 select categoryid from category
 where :name = name;
