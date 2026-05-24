@@ -34,7 +34,7 @@ values (:category-id);
 
 -- :name hanging-clockins
 -- :command :execute
--- :result :one
+-- :result :many
 select * from clockin
 where clockoutid is null;
 
