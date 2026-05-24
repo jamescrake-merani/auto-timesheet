@@ -40,7 +40,7 @@ where clockoutid is null;
 
 -- :name clock-out
 -- :command :execute
--- :result :raw
+-- :result :one
 insert into clockout default values
 returning clockoutid
 
