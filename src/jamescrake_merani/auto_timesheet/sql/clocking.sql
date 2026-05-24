@@ -41,12 +41,14 @@ where clockoutid is null;
 -- :name clock-out
 -- :command :execute
 -- :result :raw
+insert into clockout default values
+returning clockoutid
+
+-- :name attach-clock-out
+-- :command :execute
+-- :result :raw
 update clockin
-set clockin.clockoutid = new_clockout.clockoutid
-from (
-    insert into clockout default values
-    returning clockoutid
-)
+set clockoutid = :clockoutid
 where clockinid = :clockinid;
 
 -- :name get-category-from-name :? :1
