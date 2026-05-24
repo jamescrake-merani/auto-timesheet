@@ -38,7 +38,7 @@ where :name = name;
 
 -- :name create-category
 -- :command :execute
--- :result :raw
+-- :result :one
 insert into category (name)
 values (:name)
 returning categoryid;
