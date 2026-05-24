@@ -19,7 +19,7 @@
 
 ;; Find category
 (comment
-  (as-db/get-category-from-name {:name "test"}))
+  (as-db/get-category-from-name db {:name "test"}))
 
 ;; Try clocking in.
 (comment
