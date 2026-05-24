@@ -15,7 +15,7 @@ create table if not exists clockin(
 -- :result :raw
 create table if not exists clockout(
     clockoutid     integer primary key autoincrement ,
-    timestamp      datetime not null
+    timestamp      datetime not null default current_timestamp
 );
 
 -- :name create-category-table
