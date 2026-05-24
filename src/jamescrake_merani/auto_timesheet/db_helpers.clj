@@ -12,3 +12,7 @@
         :else
         (throw (.Exception "Category needs to be an id, or a name."))))
 
+(defn clock-out
+  ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid)))
+  ([db clockin-id] (as-db/clock-out {:clockinid clockin-id})))
+
