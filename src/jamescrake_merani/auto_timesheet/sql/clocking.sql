@@ -38,6 +38,14 @@ values (:category-id);
 select * from clockin
 where clockoutid is null;
 
+-- :name clock-out
+-- :command :execute
+-- :result :raw
+with clockoutid as (
+     insert into clockout default values returning clockoutid
+)
+update clockin set clockin.clockoutid = clockoutid where clockinid = :clockinid
+
 -- :name get-category-from-name :? :1
 select categoryid from category
 where :name = name;
