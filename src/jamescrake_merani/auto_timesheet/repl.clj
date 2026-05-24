@@ -28,4 +28,7 @@
 (comment
   (as-db/hanging-clockins db))
 
+(comment
+  (helpers/clock-out db))
+
 
