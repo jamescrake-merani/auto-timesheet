@@ -1,5 +1,8 @@
 (ns jamescrake-merani.auto-timesheet.db-helpers
-  (:require [jamescrake-merani.auto-timesheet.db :as as-db]))
+  (:require [jamescrake-merani.auto-timesheet.db :as as-db])
+  (:import (java.time LocalDateTime
+                      LocalDate
+                      LocalTime)))
 
 (defn clock-in [db category]
   (cond (integer? category)
@@ -16,4 +19,18 @@
   ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid)))
   ([db clockin-id] (as-db/attach-clock-out db {:clockinid clockin-id
                                                :clockoutid (as-db/clock-out db)})))
+
+;; TODO: Doesn't do the same category checks as `clock-in`
+(defn manual-entry
+  [db clockin-time clockout-time category]
+  (let [category-id (as-db/get-category-from-name {:name category})
+        ;; TODO: At the moment this assumes that clockin-time, and clockout-time
+        ;; are both times without dates but this may not always be the case.
+        clockin-timestamp (LocalDateTime/of LocalDate/now clockin-time)
+        clockout-timestamp (LocalDateTime/of LocalDate/now clockout-time)]
+    (as-db/manual-clock-in db {:timestamp clockin-timestamp
+                               :categoryid category-id
+                               :clockoutid (as-db/manual-clock-out db {:timestamp clockout-timestamp})})))
+
+
 
