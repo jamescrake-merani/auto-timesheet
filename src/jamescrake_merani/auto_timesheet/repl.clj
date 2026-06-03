@@ -31,4 +31,11 @@
 (comment
   (helpers/clock-out db))
 
+;; Try clock in & out manually
+(comment
+  (helpers/manual-entry db
+                        (java.time.LocalTime/parse "10:00")
+                        (java.time.LocalTime/parse "12:00")
+                        "work"))
+
 
