@@ -29,7 +29,7 @@
         clockin-timestamp (LocalDateTime/of (LocalDate/now) clockin-time)
         clockout-timestamp (LocalDateTime/of (LocalDate/now) clockout-time)]
     (as-db/manual-clock-in db {:timestamp clockin-timestamp
-                               :categoryid category-id
+                               :category-id category-id
                                :clockoutid (as-db/manual-clock-out db {:timestamp clockout-timestamp})})))
 
 
