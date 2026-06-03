@@ -40,7 +40,7 @@ values (:timestamp :category-id :clockoutid)
 
 -- :name manual-clock-out
 -- :command :execute
--- :result raw
+-- :result one
 insert into clockout (timestamp)
 values (:timestamp)
 returning clockoutid
