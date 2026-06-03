@@ -23,7 +23,7 @@
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
   [db clockin-time clockout-time category]
-  (let [category-id (as-db/get-category-from-name {:name category})
+  (let [category-id (as-db/get-category-from-name db {:name category})
         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
         ;; are both times without dates but this may not always be the case.
         clockin-timestamp (LocalDateTime/of LocalDate/now clockin-time)
