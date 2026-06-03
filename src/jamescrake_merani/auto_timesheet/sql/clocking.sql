@@ -36,7 +36,7 @@ values (:category-id);
 -- :command :execute
 -- :result raw
 insert into clockin (timestamp, categoryid, clockoutid)
-values (:timestamp :category-id :clockoutid)
+values (:timestamp, :category-id, :clockoutid)
 
 -- :name manual-clock-out
 -- :command :execute
