@@ -32,6 +32,19 @@ create table if not exists category(
 insert into clockin (categoryid)
 values (:category-id);
 
+-- :name manual-clock-in
+-- :command :execute
+-- :result raw
+insert into clockin (timestamp, categoryid, clockoutid)
+values (:timestamp :category-id :clockoutid)
+
+-- :name manual-clock-out
+-- :command :execute
+-- :result raw
+insert into clockout (timestamp)
+values (:timestamp)
+returning clockoutid
+
 -- :name hanging-clockins
 -- :command :execute
 -- :result :many
