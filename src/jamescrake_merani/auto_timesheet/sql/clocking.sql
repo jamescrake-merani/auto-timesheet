@@ -69,8 +69,8 @@ where clockinid = :clockinid;
 -- :result :raw
 select i.timestamp, o.timestamp
 from clockin as i
+join clockout as o on i.clockinid = o.clockoutid 
 where i.timestamp >= :periodstart and i.timestamp <= :periodend
-join clockout as o on i.clockinid = i.clockoutid 
 
 -- :name get-category-from-name :? :1
 select categoryid from category
