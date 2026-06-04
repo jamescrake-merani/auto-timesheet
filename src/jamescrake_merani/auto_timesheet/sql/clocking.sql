@@ -64,6 +64,14 @@ update clockin
 set clockoutid = :clockoutid
 where clockinid = :clockinid;
 
+-- :name clocks-within-timeperiod
+-- :commnd :execute
+-- :result :raw
+select i.timestamp, o.timestamp
+from clockin as i
+where i.timestamp >= :periodstart and i.timestamp <= :periodend
+join clockout as o on i.clockinid = i.clockoutid 
+
 -- :name get-category-from-name :? :1
 select categoryid from category
 where :name = name;
