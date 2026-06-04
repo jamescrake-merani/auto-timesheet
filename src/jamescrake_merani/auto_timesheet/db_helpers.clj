@@ -37,8 +37,7 @@
   (let [period-beginning (-> (LocalDateTime/now)
                              (.with DayOfWeek/MONDAY)
                              (.with LocalTime/MIDNIGHT))
-        period-end (-> (LocalDateTime/now)
-                       (.plusWeeks period-beginning 1))]
+        period-end (.plusWeeks period-beginning 1)]
     (as-db/clocks-within-timeperiod db {:periodstart period-beginning
                                         :periodend period-end})))
 
