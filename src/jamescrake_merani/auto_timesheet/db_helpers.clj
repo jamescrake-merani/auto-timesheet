@@ -2,7 +2,8 @@
   (:require [jamescrake-merani.auto-timesheet.db :as as-db])
   (:import (java.time LocalDateTime
                       LocalDate
-                      LocalTime)))
+                      LocalTime
+                      DayOfWeek)))
 
 (defn clock-in [db category]
   (cond (integer? category)
