@@ -38,4 +38,8 @@
                         (java.time.LocalTime/parse "12:00")
                         "work"))
 
+;; Try listing all clocks in week.
+(comment
+  (helpers/clocks-in-week db))
+
 
