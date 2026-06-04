@@ -32,5 +32,14 @@
                                :category-id category-id
                                :clockoutid (as-db/manual-clock-out db {:timestamp clockout-timestamp})})))
 
+(defn clocks-in-week
+  [db]
+  (let [period-beginning (-> (LocalDateTime/now)
+                             (.with DayOfWeek/MONDAY)
+                             (.with LocalTime/MIDNIGHT))
+        period-end (-> (LocalDateTime/now)
+                       (.plusWeeks period-beginning 1))]
+    (as-db/clocks-within-timeperiod db {:periodstart period-beginning
+                                        :periodend period-end})))
 
 
