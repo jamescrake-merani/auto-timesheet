@@ -42,4 +42,11 @@
     (as-db/clocks-within-timeperiod db {:periodstart period-beginning
                                         :periodend period-end})))
 
+(defn group-clocks-by-day
+  [clocks]
+  (group-by
+   (fn [clock]
+     (.toLocalDate (LocalDateTime/parse (:starttime clock))))
+   clocks))
+
 
