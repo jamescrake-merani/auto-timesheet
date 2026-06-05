@@ -34,13 +34,14 @@ values (:category-id);
 
 -- :name manual-clock-in
 -- :command :execute
--- :result raw
+-- :result :one
 insert into clockin (timestamp, categoryid, clockoutid)
 values (:timestamp, :category-id, :clockoutid)
+returning clockinid
 
 -- :name manual-clock-out
 -- :command :execute
--- :result one
+-- :result :one
 insert into clockout (timestamp)
 values (:timestamp)
 returning clockoutid
@@ -72,7 +73,9 @@ from clockin as i
 join clockout as o on i.clockinid = o.clockoutid 
 where i.timestamp >= :periodstart and i.timestamp <= :periodend
 
--- :name get-category-from-name :? :1
+-- :name get-category-from-name
+-- :command :execute
+-- :result :one
 select categoryid from category
 where :name = name;
 
