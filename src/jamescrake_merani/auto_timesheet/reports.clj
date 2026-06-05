@@ -22,6 +22,6 @@
 
 ;; TODO: Add weekly total.
 (defn human-readable-summary [grouped-clocks]
-  (reduce (fn [lines day clocks]
-            (cons (day-summary day clocks) lines))
-          [] (keys grouped-clocks) (vals grouped-clocks)))
+  (reduce-kv (fn [lines day clocks]
+               (cons (day-summary day clocks) lines))
+             [] grouped-clocks))
