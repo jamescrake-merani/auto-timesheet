@@ -67,8 +67,8 @@ where clockinid = :clockinid;
 
 -- :name clocks-within-timeperiod
 -- :commnd :execute
--- :result :raw
-select i.timestamp, o.timestamp
+-- :result :many
+select *
 from clockin as i
 join clockout as o on i.clockinid = o.clockoutid 
 where i.timestamp >= :periodstart and i.timestamp <= :periodend
