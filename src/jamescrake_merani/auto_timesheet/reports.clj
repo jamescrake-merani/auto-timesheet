@@ -20,7 +20,7 @@
 
 ;; TODO: Probably want to make all the locales configurable.
 (defn day-summary [date clocks]
-  (str/join "\n" (cons (format "~s:" (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK))
+  (str/join "\n" (cons (format "%s:" (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK))
                        (map format-clock clocks))))
 
 ;; TODO: Add weekly total.
