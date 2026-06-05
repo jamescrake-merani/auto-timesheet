@@ -44,9 +44,10 @@
   (def clocks-in-week (helpers/clocks-in-week db)))
 
 (comment
-  (helpers/group-clocks-by-day clocks-in-week))
+  (def grouped-clocks (helpers/group-clocks-by-day clocks-in-week)))
 
 (comment
-  (reports/format-clock (first clocks-in-week)))
+  (reports/format-clock (first clocks-in-week))
+  (reports/human-readable-summary grouped-clocks))
 
 
