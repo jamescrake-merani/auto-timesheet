@@ -42,4 +42,7 @@
 (comment
   (helpers/clocks-in-week db))
 
+(comment
+  (helpers/group-clocks-by-day (helpers/clocks-in-week db)))
+
 
