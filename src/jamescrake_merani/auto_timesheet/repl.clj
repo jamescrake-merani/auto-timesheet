@@ -2,6 +2,7 @@
   (:require [jamescrake-merani.auto-timesheet.db-init :as db-init]
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
+            [jamescrake-merani.auto-timesheet.reports :as reports]
             [clojure.java.io :as io])
   (:import (dev.dirs ProjectDirectories)))
 
@@ -40,9 +41,12 @@
 
 ;; Try listing all clocks in week.
 (comment
-  (helpers/clocks-in-week db))
+  (def clocks-in-week (helpers/clocks-in-week db)))
 
 (comment
-  (helpers/group-clocks-by-day (helpers/clocks-in-week db)))
+  (helpers/group-clocks-by-day clocks-in-week))
+
+(comment
+  (reports/format-clock (first clocks-in-week)))
 
 
