@@ -19,7 +19,7 @@
 (defn clock-out
   ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid)))
   ([db clockin-id] (as-db/attach-clock-out db {:clockinid clockin-id
-                                               :clockoutid (as-db/clock-out db)})))
+                                               :clockoutid (:clockoutid (as-db/clock-out db))})))
 
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
