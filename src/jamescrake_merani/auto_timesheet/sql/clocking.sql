@@ -3,7 +3,7 @@
 -- :result :raw
 create table if not exists clockin(
     clockinid    integer primary key autoincrement ,
-    timestamp     datetime not null default current_timestamp,
+    starttime     datetime not null default current_timestamp,
     clockoutid  integer,
     categoryid integer not null,
     foreign key(clockoutid) references clockout(clockoutid),
@@ -15,7 +15,7 @@ create table if not exists clockin(
 -- :result :raw
 create table if not exists clockout(
     clockoutid     integer primary key autoincrement ,
-    timestamp      datetime not null default current_timestamp
+    stoptime      datetime not null default current_timestamp
 );
 
 -- :name create-category-table
@@ -35,15 +35,15 @@ values (:category-id);
 -- :name manual-clock-in
 -- :command :execute
 -- :result :one
-insert into clockin (timestamp, categoryid, clockoutid)
-values (:timestamp, :category-id, :clockoutid)
+insert into clockin (starttime, categoryid, clockoutid)
+values (:starttime, :category-id, :clockoutid)
 returning clockinid
 
 -- :name manual-clock-out
 -- :command :execute
 -- :result :one
-insert into clockout (timestamp)
-values (:timestamp)
+insert into clockout (stoptime)
+values (:stoptime)
 returning clockoutid
 
 -- :name hanging-clockins
@@ -71,7 +71,7 @@ where clockinid = :clockinid;
 select *
 from clockin as i
 join clockout as o on i.clockinid = o.clockoutid 
-where i.timestamp >= :periodstart and i.timestamp <= :periodend
+where i.starttime >= :periodstart and i.starttime <= :periodend
 
 -- :name get-category-from-name
 -- :command :execute
