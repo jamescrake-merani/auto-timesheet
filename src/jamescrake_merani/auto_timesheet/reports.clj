@@ -1,7 +1,9 @@
 (ns jamescrake-merani.auto-timesheet.reports
   (:import (java.time.format DateTimeFormatter)
-           (java.time Duration)
-           (java.time LocalDateTime)))
+           (java.time Duration
+                      LocalDateTime
+                      DayOfWeek))
+  (:require [clojure.string :as str]))
 
 (defn format-clock [clock]
   (let [time-formatter (DateTimeFormatter/ofPattern "HH:mm")
@@ -15,5 +17,5 @@
             (.toMinutesPart clock-duration))))
 
 (defn day-summary [date clocks]
-  (throw "Not implemented"))
-
+  (str/join "\n" (cons (format "~s:" (.ToString (.getDayOfWeek date)))
+                       (map format-clock clocks))))
