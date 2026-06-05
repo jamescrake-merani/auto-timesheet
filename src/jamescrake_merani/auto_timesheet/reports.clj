@@ -1,4 +1,19 @@
-(ns jamescrake-merani.auto-timesheet.reports)
+(ns jamescrake-merani.auto-timesheet.reports
+  (:import (java.time.format DateTimeFormatter)
+           (java.time Duration)
+           (java.time LocalDateTime)))
 
-;; TODO: Before starting report, need to have an SQL query that will get all the
-;; clock ins, and outs (through join), then want to group them by day probably.
+(defn format-clock [clock]
+  (let [time-formatter (DateTimeFormatter/ofPattern "HH:mm")
+        start-time (LocalDateTime/parse (:starttime clock))
+        end-time (LocalDateTime/parse (:stoptime clock))
+        clock-duration (Duration/between start-time end-time)]
+    (format "~s-~s (~d hours, ~d minutes)"
+            (.format start-time time-formatter)
+            (.format end-time time-formatter)
+            (.toHoursPart clock-duration)
+            (.toMinutesPart clock-duration))))
+
+(defn day-summary [date clocks]
+  (throw "Not implemented"))
+
