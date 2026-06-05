@@ -18,6 +18,9 @@
             (.toHoursPart clock-duration)
             (.toMinutesPart clock-duration))))
 
+;; NOTE: These functions return lines which should later be flattened into one
+;; string. This can be done in the CLI code.
+
 ;; TODO: Probably want to make all the locales configurable.
 (defn day-summary [date clocks]
   (cons (format "%s:" (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK))
