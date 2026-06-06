@@ -5,7 +5,8 @@
                       DayOfWeek)
            (java.util Locale)
            (java.time.format TextStyle))
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week]]))
 
 (defn format-clock [clock]
   (let [time-formatter (DateTimeFormatter/ofPattern "HH:mm")
@@ -31,3 +32,11 @@
   (reduce-kv (fn [lines day clocks]
                (cons (day-summary day clocks) lines))
              [] grouped-clocks))
+
+;; TODO: Reports should be able to take in parameters. For now, we need to use
+;; sensible defaults.
+(defn human-readable-report [db]
+  (-> db clocks-in-week group-clocks-by-day human-readable-summary))
+
+(def reports-available
+  {:human-readable human-readable-report})
