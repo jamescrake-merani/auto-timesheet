@@ -1,20 +1,28 @@
 (ns jamescrake-merani.auto-timesheet.cli
   (:require [babashka.cli :as cli]
             [jamescrake-merani.auto-timesheet.db-init :refer [open-database]]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [jamescrake-merani.auto-timesheet.db-helpers :as helpers])
   (:import (dev.dirs ProjectDirectories))
   (:gen-class))
 
 (def directories (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet"))
+;; TODO: I'm not sure whether this should be at this level.
+(def db (open-database (io/file (.dataDir directories) "data.db")))
 
 (def clock-spec
   {:category {:alias :c}})
 
-(defn clockout [_]
+(defn clockout [{:keys [category]}]
   (println "Clock out"))
 
-(defn clockin [_]
-  (println "Clock in"))
+;: TODO Allow the user to disable this check.
+(defn clockin [{:keys [category]}]
+  (if (> (count (helpers/clock-out category)) 0)
+    (println "You are already clocked in.")
+    (do
+      (helpers/clock-in db category)
+      (println "Clocked in."))))
 
 (defn no-command [_]
   (println "You need to use a command."))
@@ -26,6 +34,5 @@
 
 ;; TODO: Might only want to init the db for some commands later.
 (defn -main [& args]
-  (let [db (open-database (io/file (.dataDir directories) "data.db"))]
-    (cli/dispatch table args)))
+  (cli/dispatch table args))
 
