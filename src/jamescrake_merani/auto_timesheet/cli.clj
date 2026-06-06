@@ -44,6 +44,7 @@
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
+   {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
