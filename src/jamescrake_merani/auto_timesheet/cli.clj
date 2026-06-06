@@ -1,6 +1,7 @@
 (ns jamescrake-merani.auto-timesheet.cli
   (:require [babashka.cli :as cli]
             [jamescrake-merani.auto-timesheet.db-init :refer [open-database]]
+            [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers])
   (:import (dev.dirs ProjectDirectories))
@@ -18,12 +19,13 @@
   (helpers/clock-out db))
 
 ;: TODO Allow the user to disable this check.
-(defn clockin [{:keys [category]}]
-  (if (> (count (helpers/clock-out category)) 0)
-    (println "You are already clocked in.")
+;; TODO: Also this check only looks for all categories not one specific one.
+(defn clockin [{{:keys [category]} :opts}]
+  (if (empty? (as-db/hanging-clockins db))
     (do
       (helpers/clock-in db category)
-      (println "Clocked in."))))
+      (println "Clocked in."))
+    (println "You are already clocked in.")))
 
 (defn no-command [_]
   (println "You need to use a command."))
