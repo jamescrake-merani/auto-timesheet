@@ -4,7 +4,8 @@
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
-            [jamescrake-merani.auto-timesheet.reports :refer [reports-available]])
+            [jamescrake-merani.auto-timesheet.reports :refer [reports-available]]
+            [clojure.string :as str])
   (:import (dev.dirs ProjectDirectories))
   (:gen-class))
 
@@ -36,7 +37,7 @@
   (let [report-function (get reports-available (keyword type))]
     (if (nil? report-function)
       (println "That report type does not exist.")
-      (println (report-function db)))))
+      (println (->> db report-function flatten (str/join "\n"))))))
 
 (defn no-command [_]
   (println "You need to use a command."))
