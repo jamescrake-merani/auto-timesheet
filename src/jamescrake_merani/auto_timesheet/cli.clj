@@ -13,8 +13,9 @@
 (def clock-spec
   {:category {:alias :c}})
 
-(defn clockout [{:keys [category]}]
-  (println "Clock out"))
+;: TODO: Probably want to be able to provide a category.
+(defn clockout [_]
+  (helpers/clock-out db))
 
 ;: TODO Allow the user to disable this check.
 (defn clockin [{:keys [category]}]
