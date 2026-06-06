@@ -9,6 +9,8 @@
   (d/create-clock-in-table db)
   (d/create-clock-out-table db))
 
+;; TODO: Might be better just to take the project directory, and work out where
+;; the db should be in there.
 (defn open-database [db-path]
   (h/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
   (let [ds (jdbc/get-datasource {:dbtype "sqlite" :dbname db-path})]
