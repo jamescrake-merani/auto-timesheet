@@ -3,7 +3,8 @@
             [jamescrake-merani.auto-timesheet.db-init :refer [open-database]]
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io]
-            [jamescrake-merani.auto-timesheet.db-helpers :as helpers])
+            [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
+            [jamescrake-merani.auto-timesheet.reports :refer [reports-available]])
   (:import (dev.dirs ProjectDirectories))
   (:gen-class))
 
@@ -26,6 +27,16 @@
       (helpers/clock-in db category)
       (println "Clocked in."))
     (println "You are already clocked in.")))
+
+(def report-spec
+  {:type {:alias :t
+          :require true}})
+
+(defn report [{{:keys [type]} :opts}]
+  (let [report-function (get reports-available (keyword type))]
+    (if (nil? report-function)
+      (println "That report type does not exist.")
+      (println (report-function db)))))
 
 (defn no-command [_]
   (println "You need to use a command."))
