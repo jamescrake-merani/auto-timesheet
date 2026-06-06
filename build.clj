@@ -4,7 +4,7 @@
 
 (def lib 'net.clojars.jamescrake-merani/auto-timesheet)
 (def version "0.1.0-SNAPSHOT")
-(def main 'jamescrake-merani.auto-timesheet)
+(def main 'jamescrake-merani.auto-timesheet.cli)
 (def class-dir "target/classes")
 
 (defn test "Run all the tests." [opts]
