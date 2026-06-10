@@ -18,7 +18,9 @@
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [_]
-  (helpers/clock-out db))
+  (helpers/clock-out db)
+  ;; TODO: Might want to show some more detail?
+  (println "Clocked out"))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
