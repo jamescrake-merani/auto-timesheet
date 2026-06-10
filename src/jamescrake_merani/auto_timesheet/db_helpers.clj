@@ -5,21 +5,25 @@
                       LocalTime
                       DayOfWeek)))
 
-(defn clock-in [db category]
+(defn clock-in [db category & [current-timestamp]]
   (cond (integer? category)
         (as-db/clock-in db {:category-id category})
         (or (keyword? category) (string? category))
         (let [category-id (as-db/get-category-from-name db {:name category})]
           (if (nil? category-id)
             (clock-in db (:categoryid (as-db/create-category db {:name category})))
-            (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))})))
+            (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
+                                :starttime current-timestamp})))
         :else
         (throw (.Exception "Category needs to be an id, or a name."))))
 
 (defn clock-out
-  ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid)))
-  ([db clockin-id] (as-db/attach-clock-out db {:clockinid clockin-id
-                                               :clockoutid (:clockoutid (as-db/clock-out db))})))
+  ([db & [current-timestamp]]
+   (clock-out db (-> (as-db/hanging-clockins db) first :clockinid) current-timestamp))
+  ([db clockin-id & [current-timestamp]]
+   (as-db/attach-clock-out db {:clockinid clockin-id
+                               :clockoutid (:clockoutid (as-db/clock-out db))
+                               :stoptime current-timestamp})))
 
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
