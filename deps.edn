@@ -8,9 +8,8 @@
         org.babashka/cli {:mvn/version "0.9.68"}}
  :aliases
  {:run-m {:main-opts ["-m" "jamescrake-merani.auto-timesheet"]}
-  :run-x {:ns-default jamescrake-merani.auto-timesheet
-          :exec-fn greet
-          :exec-args {:name "Clojure"}}
+  :run-x {:ns-default jamescrake-merani.auto-timesheet.cli
+          :exec-fn -main}
   :build {:deps {io.github.clojure/tools.build
                  {:mvn/version "0.10.11"}}
           :ns-default build}
