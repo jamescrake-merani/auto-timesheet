@@ -24,7 +24,8 @@
          :basis (b/create-basis {})
          :class-dir class-dir
          :src-dirs ["src"]
-         :ns-compile [main]))
+         :ns-compile [main]
+         :manifest {"Enable-Native-Access" "ALL-UNNAMED"}))
 
 (defn ci "Run the CI pipeline of tests (and build the uberjar)." [opts]
   (test opts)
