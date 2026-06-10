@@ -18,12 +18,12 @@
         (throw (.Exception "Category needs to be an id, or a name."))))
 
 (defn clock-out
-  ([db & [current-timestamp]]
-   (clock-out db (-> (as-db/hanging-clockins db) first :clockinid) current-timestamp))
-  ([db clockin-id & [current-timestamp]]
+  ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid) nil))
+  ([db clockin-id] (clock-out db clockin-id nil))
+  ([db clockin-id current-timestamp]
    (as-db/attach-clock-out db {:clockinid clockin-id
-                               :clockoutid (:clockoutid (as-db/clock-out db))
-                               :stoptime current-timestamp})))
+                                :clockoutid (:clockoutid (as-db/clock-out db))
+                                :stoptime current-timestamp})))
 
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
