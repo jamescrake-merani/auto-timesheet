@@ -1,4 +1,4 @@
-(ns jamescrake-merani.auto-timesheet.db-tests
+(ns jamescrake-merani.auto-timesheet.db-test
   (:require [jamescrake-merani.auto-timesheet.db-helpers :as sut]
             [jamescrake-merani.auto-timesheet.db :as db-raw]
             [jamescrake-merani.auto-timesheet.db-init :as db-init]
