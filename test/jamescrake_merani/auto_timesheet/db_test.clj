@@ -50,8 +50,8 @@
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       ;; TODO: This is repetitive.
       (let [full-clock (first (db-raw/clocks-within-timeperiod
-                               db {:periodstart (LocalDateTime/of LocalDate/now (LocalTime/of 0 0))
-                                   :periodend (LocalDateTime/of LocalDate/now (LocalTime/of 23 59))}))]
+                               db {:periodstart (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
+                                   :periodend (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))}))]
         (t/is
          (.toMinutes
           (Duration/between (LocalDateTime/parse (:starttime full-clock))
