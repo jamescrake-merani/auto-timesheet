@@ -15,7 +15,16 @@
     (t/is (count (db-raw/hanging-clockins db)) 0)))
 
 (def duration-test-data
-  [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 12 00) 120]])
+  [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 12 00) 120]
+   [(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 8 01) 1]
+   [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 14 30) 30]
+   [(LocalDateTime/of 2026 6 11 9 15) (LocalDateTime/of 2026 6 11 10 00) 45]
+   [(LocalDateTime/of 2026 6 11 12 00) (LocalDateTime/of 2026 6 11 12 00) 0]
+   [(LocalDateTime/of 2026 6 11 6 00) (LocalDateTime/of 2026 6 11 9 00) 180]
+   [(LocalDateTime/of 2026 6 11 7 30) (LocalDateTime/of 2026 6 11 13 00) 330]
+   [(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00) 480]
+   [(LocalDateTime/of 2026 6 11 16 45) (LocalDateTime/of 2026 6 11 17 00) 15]
+   [(LocalDateTime/of 2026 6 11 22 00) (LocalDateTime/of 2026 6 11 23 59) 119]])
 
 (t/deftest clockin-duration-test
   (doseq [datum duration-test-data]
