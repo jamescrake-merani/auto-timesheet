@@ -28,6 +28,13 @@
    [(LocalDateTime/of 2026 6 11 16 45) (LocalDateTime/of 2026 6 11 17 00) 15]
    [(LocalDateTime/of 2026 6 11 22 00) (LocalDateTime/of 2026 6 11 23 59) 119]])
 
+(defn verify-duration [clock expected-minutes]
+  (t/is
+   (.toMinutes
+    (Duration/between (LocalDateTime/parse (:starttime clock))
+                      (LocalDateTime/parse (:stoptime clock))))
+   expected-minutes))
+
 (t/deftest clockin-duration-test
   (doseq [datum duration-test-data]
     (let [db (db-init/open-database ":memory:")]
@@ -37,11 +44,7 @@
                         (db-raw/clocks-within-timeperiod
                          db {:periodstart (LocalDateTime/of 2026 6 11 0 0)
                              :periodend (LocalDateTime/of 2026 6 11 23 59)}))]
-        (t/is
-         (.toMinutes
-          (Duration/between (LocalDateTime/parse (:starttime full-clock))
-                            (LocalDateTime/parse (:stoptime full-clock))))
-         (nth datum 2))))))
+        (verify-duration full-clock (nth datum 2))))))
 
 (t/deftest manual-clock-duration-test
   (doseq [datum duration-test-data]
