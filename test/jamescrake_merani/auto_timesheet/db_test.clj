@@ -46,6 +46,7 @@
 (t/deftest manual-clock-duration-test
   (doseq [datum duration-test-data]
     (let [db (db-init/open-database ":memory:")]
+      (db-raw/create-category db {:name "test"})
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       ;; TODO: This is repetitive.
       (let [full-clock (first (db-raw/clocks-within-timeperiod
