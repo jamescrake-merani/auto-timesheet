@@ -55,9 +55,5 @@
       (let [full-clock (first (db-raw/clocks-within-timeperiod
                                db {:periodstart (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
                                    :periodend (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))}))]
-        (t/is
-         (.toMinutes
-          (Duration/between (LocalDateTime/parse (:starttime full-clock))
-                            (LocalDateTime/parse (:stoptime full-clock))))
-         (nth datum 2))))))
+        (verify-duration full-clock (nth datum 2))))))
 
