@@ -4,6 +4,8 @@
             [jamescrake-merani.auto-timesheet.db-init :as db-init]
             [clojure.test :as t])
   (:import (java.time LocalDateTime
+                      LocalDate
+                      LocalTime
                       Duration)))
 
 (t/deftest clockin-clockout-test
@@ -44,11 +46,11 @@
 (t/deftest manual-clock-duration-test
   (doseq [datum duration-test-data]
     (let [db (db-init/open-database ":memory:")]
-      (sut/manual-entry db (first datum) (second datum) "test")
+      (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       ;; TODO: This is repetitive.
       (let [full-clock (first (db-raw/clocks-within-timeperiod
-                               db {:periodstart (LocalDateTime/of 2026 6 11 0 0)
-                                   :periodend (LocalDateTime/of 2026 6 11 23 59)}))]
+                               db {:periodstart (LocalDateTime/of LocalDate/now (LocalTime/of 0 0))
+                                   :periodend (LocalDateTime/of LocalDate/now (LocalTime/of 23 59))}))]
         (t/is
          (.toMinutes
           (Duration/between (LocalDateTime/parse (:starttime full-clock))
