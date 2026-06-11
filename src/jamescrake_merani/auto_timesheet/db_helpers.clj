@@ -17,9 +17,15 @@
         :else
         (throw (.Exception "Category needs to be an id, or a name."))))
 
+(defn- hanging-clockin-id [db]
+  (-> (as-db/hanging-clockins db) first :clockinid))
+
 (defn clock-out
-  ([db] (clock-out db (-> (as-db/hanging-clockins db) first :clockinid) nil))
-  ([db clockin-id] (clock-out db clockin-id nil))
+  ([db] (clock-out db (hanging-clockin-id db) nil))
+  ([db clockin-id-or-timestamp]
+   (if (integer? clockin-id-or-timestamp)
+     (clock-out db clockin-id-or-timestamp nil)
+     (clock-out db (hanging-clockin-id db) clockin-id-or-timestamp)))
   ([db clockin-id current-timestamp]
    (as-db/attach-clock-out db {:clockinid clockin-id
                                 :clockoutid (:clockoutid (as-db/clock-out db))
