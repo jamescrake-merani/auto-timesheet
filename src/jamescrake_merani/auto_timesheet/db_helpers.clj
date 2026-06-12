@@ -9,7 +9,7 @@
   ([db category] (clock-in db category (LocalDateTime/now)))
   ([db category current-timestamp]
    (cond (integer? category)
-         (as-db/clock-in db {:category-id category})
+         (as-db/clock-in db {:category-id category :starttime current-timestamp})
          (or (keyword? category) (string? category))
          (let [category-id (as-db/get-category-from-name db {:name category})]
            (if (nil? category-id)
