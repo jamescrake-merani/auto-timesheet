@@ -24,12 +24,12 @@
   ([db] (clock-out db (hanging-clockin-id db) nil))
   ([db clockin-id-or-timestamp]
    (if (integer? clockin-id-or-timestamp)
-     (clock-out db clockin-id-or-timestamp nil)
+     (clock-out db clockin-id-or-timestamp (LocalDateTime/now))
      (clock-out db (hanging-clockin-id db) clockin-id-or-timestamp)))
   ([db clockin-id current-timestamp]
    (as-db/attach-clock-out db {:clockinid clockin-id
-                                :clockoutid (:clockoutid (as-db/clock-out db))
-                                :stoptime current-timestamp})))
+                               :clockoutid (:clockoutid (as-db/clock-out db))
+                               :stoptime current-timestamp})))
 
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
