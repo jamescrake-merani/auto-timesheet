@@ -30,7 +30,7 @@ create table if not exists category(
 -- :command :execute
 -- :result :raw
 insert into clockin (categoryid, starttime)
-values (:category-id, starttime);
+values (:category-id, :starttime);
 
 -- :name manual-clock-in
 -- :command :execute
