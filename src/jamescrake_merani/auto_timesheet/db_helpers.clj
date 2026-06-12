@@ -13,7 +13,7 @@
          (or (keyword? category) (string? category))
          (let [category-id (as-db/get-category-from-name db {:name category})]
            (if (nil? category-id)
-             (clock-in db (:categoryid (as-db/create-category db {:name category})))
+             (clock-in db (:categoryid (as-db/create-category db {:name category})) current-timestamp)
              (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
                                  :starttime current-timestamp})))
          :else
