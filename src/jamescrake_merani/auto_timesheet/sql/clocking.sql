@@ -29,8 +29,8 @@ create table if not exists category(
 -- :name clock-in
 -- :command :execute
 -- :result :raw
-insert into clockin (categoryid)
-values (:category-id);
+insert into clockin (categoryid, starttime)
+values (:category-id, starttime);
 
 -- :name manual-clock-in
 -- :command :execute
@@ -55,7 +55,8 @@ where clockoutid is null;
 -- :name clock-out
 -- :command :execute
 -- :result :one
-insert into clockout default values
+insert into clockout (stoptime)
+values (:stoptime)
 returning clockoutid
 
 -- :name attach-clock-out
