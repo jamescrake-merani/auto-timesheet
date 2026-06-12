@@ -5,17 +5,19 @@
                       LocalTime
                       DayOfWeek)))
 
-(defn clock-in [db category & [current-timestamp]]
-  (cond (integer? category)
-        (as-db/clock-in db {:category-id category})
-        (or (keyword? category) (string? category))
-        (let [category-id (as-db/get-category-from-name db {:name category})]
-          (if (nil? category-id)
-            (clock-in db (:categoryid (as-db/create-category db {:name category})))
-            (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
-                                :starttime current-timestamp})))
-        :else
-        (throw (.Exception "Category needs to be an id, or a name."))))
+(defn clock-in
+  ([db category] (clock-in db category (LocalDateTime/now)))
+  ([db category current-timestamp]
+   (cond (integer? category)
+         (as-db/clock-in db {:category-id category})
+         (or (keyword? category) (string? category))
+         (let [category-id (as-db/get-category-from-name db {:name category})]
+           (if (nil? category-id)
+             (clock-in db (:categoryid (as-db/create-category db {:name category})))
+             (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
+                                 :starttime current-timestamp})))
+         :else
+         (throw (.Exception "Category needs to be an id, or a name.")))))
 
 (defn- hanging-clockin-id [db]
   (-> (as-db/hanging-clockins db) first :clockinid))
