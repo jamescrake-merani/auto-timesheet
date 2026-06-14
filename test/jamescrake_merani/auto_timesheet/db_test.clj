@@ -30,10 +30,10 @@
 
 (defn verify-duration [clock expected-minutes]
   (t/is
-   (.toMinutes
-    (Duration/between (LocalDateTime/parse (:starttime clock))
-                      (LocalDateTime/parse (:stoptime clock))))
-   expected-minutes))
+   (= (.toMinutes
+       (Duration/between (LocalDateTime/parse (:starttime clock))
+                         (LocalDateTime/parse (:stoptime clock))))
+      expected-minutes)))
 
 (t/deftest clockin-duration-test
   (doseq [datum duration-test-data]
