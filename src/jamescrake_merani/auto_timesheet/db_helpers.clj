@@ -32,14 +32,19 @@
    (as-db/attach-clock-out db {:clockinid clockin-id
                                :clockoutid (:clockoutid (as-db/clock-out db {:stoptime current-timestamp}))})))
 
+(defn- full-date [date-or-time]
+  (if (instance? LocalDateTime date-or-time)
+    date-or-time
+    (LocalDateTime/of (LocalDate/now) date-or-time)))
+
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
   [db clockin-time clockout-time category]
   (let [category-id (as-db/get-category-from-name db {:name category})
         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
         ;; are both times without dates but this may not always be the case.
-        clockin-starttime (LocalDateTime/of (LocalDate/now) clockin-time)
-        clockout-stoptime (LocalDateTime/of (LocalDate/now) clockout-time)]
+        clockin-starttime (full-date clockin-time)
+        clockout-stoptime (full-date clockout-time)]
     (as-db/manual-clock-in db {:starttime clockin-starttime
                                :category-id category-id
                                :clockoutid (as-db/manual-clock-out db {:stoptime clockout-stoptime})})))
