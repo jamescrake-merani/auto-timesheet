@@ -27,12 +27,11 @@
                           (LocalDateTime/parse "2026-06-11T16:15")
                           "work")
     (t/is (=
-           "Monday
+           "Monday:
 10:00-12:00 (2 hours, 0 minutes)
 13:00-16:00 (3 hours, 0 minutes)
-Thursday
+Thursday:
 02:00-09:30 (7 hours, 30 minutes)
-15:10-16:15 (1 hours, 5 minutes)
-"
+15:10-16:15 (1 hours, 5 minutes)"
            (->> db sut/human-readable-report flatten (str/join "\n"))))))
 
