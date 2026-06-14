@@ -10,11 +10,11 @@
 
 (t/deftest clockin-clockout-test
   (let [db (db-init/open-database ":memory:")]
-    (t/is (count (db-raw/hanging-clockins db)) 0)
+    (t/is (= (count (db-raw/hanging-clockins db)) 0))
     (sut/clock-in db "test")
-    (t/is (count (db-raw/hanging-clockins db)) 1)
+    (t/is (= (count (db-raw/hanging-clockins db)) 1))
     (sut/clock-out db)
-    (t/is (count (db-raw/hanging-clockins db)) 0)))
+    (t/is (= (count (db-raw/hanging-clockins db)) 0))))
 
 (def duration-test-data
   [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 12 00) 120]
