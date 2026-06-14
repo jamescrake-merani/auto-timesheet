@@ -3,7 +3,8 @@
             [jamescrake-merani.auto-timesheet.db-init :as db-init]
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
-            [clojure.test :as t])
+            [clojure.test :as t]
+            [clojure.string :as str])
   (:import (java.time LocalDateTime)))
 
 (t/deftest human-readable-report-test
@@ -33,5 +34,5 @@ Thursday
 02:00-09:30 (7 hours, 30 minutes)
 15:10-16:15 (1 hours, 5 minutes)
 "
-           (sut/human-readable-report db)))))
+           (->> db sut/human-readable-report flatten (str/join "\n"))))))
 
