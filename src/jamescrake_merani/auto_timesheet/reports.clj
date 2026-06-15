@@ -30,7 +30,7 @@
 ;; TODO: Add weekly total.
 (defn human-readable-summary [grouped-clocks]
   (reduce-kv (fn [lines day clocks]
-               (conj (day-summary day clocks) lines))
+               (into lines (day-summary day clocks)))
              [] grouped-clocks))
 
 ;; TODO: Reports should be able to take in parameters. For now, we need to use
