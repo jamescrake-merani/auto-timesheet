@@ -67,11 +67,11 @@ set clockoutid = :clockoutid
 where clockinid = :clockinid;
 
 -- :name clocks-within-timeperiod
--- :commnd :execute
+-- :command :execute
 -- :result :many
 select *
 from clockin as i
-join clockout as o on i.clockinid = o.clockoutid 
+join clockout as o on i.clockoutid = o.clockoutid 
 where i.starttime >= :periodstart and i.starttime <= :periodend
 
 -- :name get-category-from-name
