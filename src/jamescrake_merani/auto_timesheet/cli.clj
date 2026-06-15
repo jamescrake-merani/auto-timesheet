@@ -25,11 +25,12 @@
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
 (defn clockin [{{:keys [category]} :opts}]
-  (if (empty? (as-db/hanging-clockins db))
-    (do
-      (helpers/clock-in db category)
-      (println "Clocked in."))
-    (println "You are already clocked in.")))
+  (cond
+    (not (empty? (as-db/hanging-clockins db))) (println "You are already clocked in.")
+    (nil? category) (println "You need to provide a category with clock ins.")
+    :else (do
+            (helpers/clock-in db category)
+            (println "Clocked in."))))
 
 (def report-spec
   {:type {:alias :t
