@@ -56,5 +56,3 @@
                                    :periodend (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))}))]
         (verify-duration full-clock (nth datum 2))))))
 
-;; TODO: Now do reports.
-
