@@ -37,7 +37,7 @@
 ;; sensible defaults.
 (defn human-readable-report
   ([db] (human-readable-report db (LocalDateTime/now)))
-  ([db date] (-> db clocks-in-week group-clocks-by-day human-readable-summary)))
+  ([db date] (-> db (clocks-in-week date) group-clocks-by-day human-readable-summary)))
 
 (def reports-available
   {:human-readable human-readable-report})
