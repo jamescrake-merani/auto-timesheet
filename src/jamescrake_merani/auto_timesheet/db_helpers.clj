@@ -47,7 +47,7 @@
         clockout-stoptime (full-date clockout-time)]
     (as-db/manual-clock-in db {:starttime clockin-starttime
                                :category-id category-id
-                               :clockoutid (:clockoutid (as-db/manual-clock-out db {:stoptime clockout-stoptime}))})))
+                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime clockout-stoptime}))})))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))

@@ -39,12 +39,6 @@ insert into clockin (starttime, categoryid, clockoutid)
 values (:starttime, :category-id, :clockoutid)
 returning clockinid
 
--- :name manual-clock-out
--- :command :execute
--- :result :one
-insert into clockout (stoptime)
-values (:stoptime)
-returning clockoutid
 
 -- :name hanging-clockins
 -- :command :execute
