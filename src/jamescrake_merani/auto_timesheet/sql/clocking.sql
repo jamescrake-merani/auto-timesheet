@@ -29,8 +29,8 @@ create table if not exists category(
 -- :name clock-in
 -- :command :execute
 -- :result :raw
-insert into clockin (categoryid)
-values (:category-id);
+insert into clockin (categoryid, starttime)
+values (:category-id, :starttime);
 
 -- :name manual-clock-in
 -- :command :execute
@@ -39,12 +39,6 @@ insert into clockin (starttime, categoryid, clockoutid)
 values (:starttime, :category-id, :clockoutid)
 returning clockinid
 
--- :name manual-clock-out
--- :command :execute
--- :result :one
-insert into clockout (stoptime)
-values (:stoptime)
-returning clockoutid
 
 -- :name hanging-clockins
 -- :command :execute
@@ -55,7 +49,8 @@ where clockoutid is null;
 -- :name clock-out
 -- :command :execute
 -- :result :one
-insert into clockout default values
+insert into clockout (stoptime)
+values (:stoptime)
 returning clockoutid
 
 -- :name attach-clock-out
@@ -66,11 +61,11 @@ set clockoutid = :clockoutid
 where clockinid = :clockinid;
 
 -- :name clocks-within-timeperiod
--- :commnd :execute
+-- :command :execute
 -- :result :many
 select *
 from clockin as i
-join clockout as o on i.clockinid = o.clockoutid 
+join clockout as o on i.clockoutid = o.clockoutid 
 where i.starttime >= :periodstart and i.starttime <= :periodend
 
 -- :name get-category-from-name

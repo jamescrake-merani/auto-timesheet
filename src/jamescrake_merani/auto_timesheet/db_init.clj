@@ -13,6 +13,6 @@
 ;; the db should be in there.
 (defn open-database [db-path]
   (h/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
-  (let [ds (jdbc/get-datasource {:dbtype "sqlite" :dbname db-path})]
-    (init-database ds)
-    ds))
+  (let [conn (jdbc/get-connection {:dbtype "sqlite" :dbname db-path})]
+    (init-database conn)
+    conn))

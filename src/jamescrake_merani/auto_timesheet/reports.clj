@@ -30,13 +30,14 @@
 ;; TODO: Add weekly total.
 (defn human-readable-summary [grouped-clocks]
   (reduce-kv (fn [lines day clocks]
-               (cons (day-summary day clocks) lines))
+               (into lines (day-summary day clocks)))
              [] grouped-clocks))
 
 ;; TODO: Reports should be able to take in parameters. For now, we need to use
 ;; sensible defaults.
-(defn human-readable-report [db]
-  (-> db clocks-in-week group-clocks-by-day human-readable-summary))
+(defn human-readable-report
+  ([db] (human-readable-report db (LocalDateTime/now)))
+  ([db date] (-> db (clocks-in-week date) group-clocks-by-day human-readable-summary)))
 
 (def reports-available
   {:human-readable human-readable-report})
