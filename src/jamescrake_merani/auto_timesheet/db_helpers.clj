@@ -50,13 +50,14 @@
                                :clockoutid (as-db/manual-clock-out db {:stoptime clockout-stoptime})})))
 
 (defn clocks-in-week
-  [db]
-  (let [period-beginning (-> (LocalDateTime/now)
-                             (.with DayOfWeek/MONDAY)
-                             (.with LocalTime/MIDNIGHT))
-        period-end (.plusWeeks period-beginning 1)]
-    (as-db/clocks-within-timeperiod db {:periodstart period-beginning
-                                        :periodend period-end})))
+  ([db] (clocks-in-week db (LocalDateTime/now)))
+  ([db date]
+   (let [period-beginning (-> date
+                              (.with DayOfWeek/MONDAY)
+                              (.with LocalTime/MIDNIGHT))
+         period-end (.plusWeeks period-beginning 1)]
+     (as-db/clocks-within-timeperiod db {:periodstart period-beginning
+                                         :periodend period-end}))))
 
 (defn group-clocks-by-day
   [clocks]
