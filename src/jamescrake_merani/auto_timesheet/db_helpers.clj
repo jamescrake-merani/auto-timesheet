@@ -40,14 +40,14 @@
 ;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
   [db clockin-time clockout-time category]
-  (let [category-id (as-db/get-category-from-name db {:name category})
+  (let [category-id (:categoryid (as-db/get-category-from-name db {:name category}))
         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
         ;; are both times without dates but this may not always be the case.
         clockin-starttime (full-date clockin-time)
         clockout-stoptime (full-date clockout-time)]
     (as-db/manual-clock-in db {:starttime clockin-starttime
                                :category-id category-id
-                               :clockoutid (as-db/manual-clock-out db {:stoptime clockout-stoptime})})))
+                               :clockoutid (:clockoutid (as-db/manual-clock-out db {:stoptime clockout-stoptime}))})))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
