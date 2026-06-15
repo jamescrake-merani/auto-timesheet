@@ -53,5 +53,8 @@
 
 ;; TODO: Might only want to init the db for some commands later.
 (defn -main [& args]
-  (cli/dispatch table args))
+  (cli/dispatch table args {:error-fn (fn [{:keys [spec type cause msg option] :as data}]
+                                        (if (= :org.babashka/cli type)
+                                          (println msg)
+                                          (throw (ex-info msg data))))}))
 
