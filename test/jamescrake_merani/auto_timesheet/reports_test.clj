@@ -33,7 +33,7 @@
 Thursday:
 02:00-09:30 (7 hours, 30 minutes)
 15:10-16:15 (1 hours, 5 minutes)"
-           (->> (sut/human-readable-report db (LocalDateTime/parse "2026-06-11T16:15"))
+           (->> (sut/human-readable-report db (LocalDateTime/parse "2026-06-11T00:00"))
                 flatten
                 (str/join "\n"))))))
 
