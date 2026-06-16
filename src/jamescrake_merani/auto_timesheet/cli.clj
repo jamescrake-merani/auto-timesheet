@@ -44,11 +44,11 @@
       (println "That report type does not exist.")
       (println (->> db report-function flatten (str/join "\n"))))))
 
-(defn print-status []
+(defn print-status [_]
   (let [hanging-clockins (as-db/hanging-clockins db)]
     (if (empty? hanging-clockins)
       (println "You are not currently clocked in.")
-      (format "You are currently clocked in. ~s elapsed since clockin."
+      (format "You are currently clocked in. %s elapsed since clockin."
               (format-duration (Duration/between (-> hanging-clockins first :starttime)
                                                  LocalDateTime/now))))))
 
@@ -59,6 +59,7 @@
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
+   {:cmds ["status"] :fn print-status "Shows current clock in status"}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
