@@ -18,7 +18,7 @@
         start-time (LocalDateTime/parse (:starttime clock))
         end-time (LocalDateTime/parse (:stoptime clock))
         clock-duration (Duration/between start-time end-time)]
-    (format "%s-%s (~s)"
+    (format "%s-%s (%s)"
             (.format start-time time-formatter)
             (.format end-time time-formatter)
             (format-duration clock-duration))))
