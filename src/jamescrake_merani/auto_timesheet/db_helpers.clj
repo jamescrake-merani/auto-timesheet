@@ -17,7 +17,7 @@
              (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
                                  :starttime current-timestamp})))
          :else
-         (throw (.Exception "Category needs to be an id, or a name.")))))
+         (throw (Exception. "Category needs to be an id, or a name.")))))
 
 (defn- hanging-clockin-id [db]
   (-> (as-db/hanging-clockins db) first :clockinid))
