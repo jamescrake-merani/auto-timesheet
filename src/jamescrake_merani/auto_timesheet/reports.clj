@@ -9,7 +9,7 @@
             [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week]]))
 
 (defn format-duration [d]
-  (format "(%d hours, %d minutes)"
+  (format "%d hours, %d minutes"
           (.toHoursPart d)
           (.toMinutesPart d)))
 
@@ -18,7 +18,7 @@
         start-time (LocalDateTime/parse (:starttime clock))
         end-time (LocalDateTime/parse (:stoptime clock))
         clock-duration (Duration/between start-time end-time)]
-    (format "%s-%s ~s"
+    (format "%s-%s (~s)"
             (.format start-time time-formatter)
             (.format end-time time-formatter)
             (format-duration clock-duration))))
