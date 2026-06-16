@@ -48,9 +48,10 @@
   (let [hanging-clockins (as-db/hanging-clockins db)]
     (if (empty? hanging-clockins)
       (println "You are not currently clocked in.")
-      (format "You are currently clocked in. %s elapsed since clockin."
-              (format-duration (Duration/between (-> hanging-clockins first :starttime)
-                                                 LocalDateTime/now))))))
+      (println
+       (format "You are currently clocked in. %s elapsed since clockin."
+               (format-duration (Duration/between (-> hanging-clockins first :starttime)
+                                                  LocalDateTime/now)))))))
 
 (defn no-command [_]
   (println "You need to use a command."))
