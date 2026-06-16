@@ -11,16 +11,16 @@
                       LocalDateTime))
   (:gen-class))
 
-(def directories (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet"))
+(def directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
 ;; TODO: I'm not sure whether this should be at this level.
-(def db (open-database (io/file (.dataDir directories) "data.db")))
+(def db (delay (open-database (io/file (.dataDir @directories) "data.db"))))
 
 (def clock-spec
   {:category {:alias :c}})
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [_]
-  (helpers/clock-out db)
+  (helpers/clock-out @db)
   ;; TODO: Might want to show some more detail?
   (println "Clocked out"))
 
@@ -28,10 +28,10 @@
 ;; TODO: Also this check only looks for all categories not one specific one.
 (defn clockin [{{:keys [category]} :opts}]
   (cond
-    (not (empty? (as-db/hanging-clockins db))) (println "You are already clocked in.")
+    (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
     (nil? category) (println "You need to provide a category with clock ins.")
     :else (do
-            (helpers/clock-in db category)
+            (helpers/clock-in @db category)
             (println "Clocked in."))))
 
 (def report-spec
@@ -42,10 +42,10 @@
   (let [report-function (get reports-available (keyword type))]
     (if (nil? report-function)
       (println "That report type does not exist.")
-      (println (->> db report-function flatten (str/join "\n"))))))
+      (println (->> @db report-function flatten (str/join "\n"))))))
 
 (defn print-status []
-  (let [hanging-clockins (as-db/hanging-clockins db)]
+  (let [hanging-clockins (as-db/hanging-clockins @db)]
     (if (empty? hanging-clockins)
       (println "You are not currently clocked in.")
       (println
