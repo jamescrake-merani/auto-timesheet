@@ -54,6 +54,7 @@
                                                   LocalDateTime/now)))))))
 
 (defn no-command [_]
+  (print-status)
   (println "You need to use a command."))
 
 (def table
