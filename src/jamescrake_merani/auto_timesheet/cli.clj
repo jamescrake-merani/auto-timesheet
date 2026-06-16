@@ -61,7 +61,7 @@
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
-   {:cmds ["status"] :fn print-status "Shows current clock in status"}
+   {:cmds ["status"] :fn print-status :doc "Shows current clock in status"}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
