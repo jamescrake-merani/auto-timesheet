@@ -50,7 +50,7 @@
       (println "You are not currently clocked in.")
       (println
        (format "You are currently clocked in. %s elapsed since clockin."
-               (format-duration (Duration/between (-> hanging-clockins first :starttime)
+               (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
                                                   LocalDateTime/now)))))))
 
 (defn no-command [_]
