@@ -58,7 +58,7 @@
 
 (defn no-command [_]
   (print-status)
-  (println "You need to use a command."))
+  (println "Run auto-timesheet --help for a list of all commands."))
 
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
