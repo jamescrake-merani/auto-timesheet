@@ -6,7 +6,7 @@
             [clojure.java.io :as io])
   (:import (dev.dirs ProjectDirectories)))
 
-(def proj-dirs (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet"))
+(def ^ProjectDirectories proj-dirs (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet"))
 
 (def db (db-init/open-database (io/file (.dataDir proj-dirs) "data.db")))
 

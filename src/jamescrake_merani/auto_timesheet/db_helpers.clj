@@ -51,8 +51,8 @@
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
-  ([db date]
-   (let [period-beginning (-> date
+  ([db ^LocalDateTime date]
+   (let [^LocalDateTime period-beginning (-> date
                               (.with DayOfWeek/MONDAY)
                               (.with LocalTime/MIDNIGHT))
          period-end (.plusWeeks period-beginning 1)]

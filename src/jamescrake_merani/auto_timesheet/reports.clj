@@ -1,6 +1,7 @@
 (ns jamescrake-merani.auto-timesheet.reports
   (:import (java.time.format DateTimeFormatter)
            (java.time Duration
+                      LocalDate
                       LocalDateTime
                       DayOfWeek)
            (java.util Locale)
@@ -8,7 +9,7 @@
   (:require [clojure.string :as str]
             [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week]]))
 
-(defn format-duration [d]
+(defn format-duration [^java.time.Duration d]
   (format "%d hours, %d minutes"
           (.toHoursPart d)
           (.toMinutesPart d)))
@@ -27,7 +28,7 @@
 ;; string. This can be done in the CLI code.
 
 ;; TODO: Probably want to make all the locales configurable.
-(defn day-summary [date clocks]
+(defn day-summary [^LocalDate date clocks]
   (cons (format "%s:" (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK))
         (map format-clock clocks)))
 
