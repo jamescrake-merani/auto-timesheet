@@ -5,7 +5,8 @@
         org.xerial/sqlite-jdbc {:mvn/version "3.51.2.0"}
         seancorfield/next.jdbc {:mvn/version "1.2.659"}
         dev.dirs/directories {:mvn/version "26"}
-        org.babashka/cli {:mvn/version "0.9.68"}}
+        org.babashka/cli {:mvn/version "0.9.68"}
+        com.github.clj-easy/graal-build-time {:mvn/version "1.0.6"}}
  :aliases
  {:run-m {:main-opts ["-m" "jamescrake-merani.auto-timesheet"]}
   :run-x {:ns-default jamescrake-merani.auto-timesheet.cli
