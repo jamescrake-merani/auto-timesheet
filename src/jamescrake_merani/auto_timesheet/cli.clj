@@ -4,9 +4,11 @@
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
-            [jamescrake-merani.auto-timesheet.reports :refer [reports-available]]
+            [jamescrake-merani.auto-timesheet.reports :refer [reports-available format-duration]]
             [clojure.string :as str])
-  (:import (dev.dirs ProjectDirectories))
+  (:import (dev.dirs ProjectDirectories)
+           (java.time Duration
+                      LocalDateTime))
   (:gen-class))
 
 (def directories (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet"))
@@ -41,6 +43,14 @@
     (if (nil? report-function)
       (println "That report type does not exist.")
       (println (->> db report-function flatten (str/join "\n"))))))
+
+(defn print-status []
+  (let [hanging-clockins (as-db/hanging-clockins db)]
+    (if (empty? hanging-clockins)
+      (println "You are not currently clocked in.")
+      (format "You are currently clocked in. ~s elapsed since clockin."
+              (format-duration (Duration/between (-> hanging-clockins first :starttime)
+                                                 LocalDateTime/now))))))
 
 (defn no-command [_]
   (println "You need to use a command."))
