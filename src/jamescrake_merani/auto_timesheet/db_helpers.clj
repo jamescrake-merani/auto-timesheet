@@ -50,10 +50,10 @@
                                :clockoutid (:clockoutid (as-db/clock-out db {:stoptime clockout-stoptime}))})))
 
 (defn delete-clocks [db period-start period-end]
-  (as-db/delete-clockouts-within-timeperiod {:periodstart period-start
-                                             :periodend period-end})
-  (as-db/delete-clockins-within-timeperiod {:periodstart period-start
-                                            :periodend period-end}))
+  (as-db/delete-clockouts-within-timeperiod db {:periodstart period-start
+                                                :periodend period-end})
+  (as-db/delete-clockins-within-timeperiod db {:periodstart period-start
+                                               :periodend period-end}))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
