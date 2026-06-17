@@ -23,9 +23,9 @@
   (let [hanging-clockins (as-db/hanging-clockins @db)
         time-since-clockin (if hanging-clockins
                              (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
-    (when empty? hanging-clockins
-          (.println *err* "You are not clocked in.")
-          (System/exit 1))
+    (when (empty? hanging-clockins)
+      (.println *err* "You are not clocked in.")
+      (System/exit 1))
     (helpers/clock-out @db)
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
