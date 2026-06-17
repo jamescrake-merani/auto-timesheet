@@ -75,7 +75,7 @@
 (defn -main [& args]
   (cli/dispatch table args {:error-fn (fn [{:keys [spec type cause msg option] :as data}]
                                         (if (= :org.babashka/cli type)
-                                          (println msg)
+                                          (.println *err* msg)
                                           (throw (ex-info msg data)))
                                         (System/exit 1))
                             :prog "auto-timesheet"
