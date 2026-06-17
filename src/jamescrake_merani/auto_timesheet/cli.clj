@@ -43,7 +43,9 @@
 (defn report [{{:keys [type]} :opts}]
   (let [report-function (get reports-available (keyword type))]
     (if (nil? report-function)
-      (println "That report type does not exist.")
+      (do
+        (.println *err* "That report type does not exist.")
+        (System/exit 1))
       (println (->> @db report-function flatten (str/join "\n"))))))
 
 (defn print-status []
