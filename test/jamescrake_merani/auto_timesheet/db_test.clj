@@ -71,8 +71,3 @@
       (t/is (= (count (db-raw/clocks-within-timeperiod (:periodstart (first (:period datum))
                                                                      (second (:period datum)))))
                0)))))
-
-
-
-
-
