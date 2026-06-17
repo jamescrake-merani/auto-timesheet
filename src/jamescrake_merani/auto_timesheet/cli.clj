@@ -30,7 +30,8 @@
 (defn clockin [{{:keys [category]} :opts}]
   (cond
     (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
-    (nil? category) (println "You need to provide a category with clock ins.")
+    (nil? category) (do (.println *err*  "You need to provide a category with clock ins.")
+                        (System/exit 1))
     :else (do
             (helpers/clock-in @db category)
             (println "Clocked in."))))
