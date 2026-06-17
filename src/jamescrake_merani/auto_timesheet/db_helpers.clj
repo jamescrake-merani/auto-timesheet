@@ -17,7 +17,7 @@
              (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
                                  :starttime current-timestamp})))
          :else
-         (throw (.Exception "Category needs to be an id, or a name.")))))
+         (throw (Exception. "Category needs to be an id, or a name.")))))
 
 (defn- hanging-clockin-id [db]
   (-> (as-db/hanging-clockins db) first :clockinid))
@@ -51,8 +51,8 @@
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
-  ([db date]
-   (let [period-beginning (-> date
+  ([db ^LocalDateTime date]
+   (let [^LocalDateTime period-beginning (-> date
                               (.with DayOfWeek/MONDAY)
                               (.with LocalTime/MIDNIGHT))
          period-end (.plusWeeks period-beginning 1)]

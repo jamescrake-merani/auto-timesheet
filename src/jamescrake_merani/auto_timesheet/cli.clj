@@ -13,7 +13,7 @@
 
 (def directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
 ;; TODO: I'm not sure whether this should be at this level.
-(def db (delay (open-database (io/file (.dataDir @directories) "data.db"))))
+(def db (delay (open-database (io/file (.dataDir ^ProjectDirectories @directories) "data.db"))))
 
 (def clock-spec
   {:category {:alias :c}})
