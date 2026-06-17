@@ -20,7 +20,12 @@
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [_]
-  (let [time-since-clockin (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse)]
+  (let [hanging-clockins (as-db/hanging-clockins @db)
+        time-since-clockin (when (not (empty? hanging-clockins))
+                             (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
+    (when (empty? hanging-clockins)
+      (.println *err* "You are not clocked in.")
+      (System/exit 1))
     (helpers/clock-out @db)
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
@@ -30,7 +35,8 @@
 (defn clockin [{{:keys [category]} :opts}]
   (cond
     (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
-    (nil? category) (println "You need to provide a category with clock ins.")
+    (nil? category) (do (.println *err*  "You need to provide a category with clock ins.")
+                        (System/exit 1))
     :else (do
             (helpers/clock-in @db category)
             (println "Clocked in."))))
@@ -42,7 +48,9 @@
 (defn report [{{:keys [type]} :opts}]
   (let [report-function (get reports-available (keyword type))]
     (if (nil? report-function)
-      (println "That report type does not exist.")
+      (do
+        (.println *err* "That report type does not exist.")
+        (System/exit 1))
       (println (->> @db report-function flatten (str/join "\n"))))))
 
 (defn print-status []
@@ -72,7 +80,7 @@
 (defn -main [& args]
   (cli/dispatch table args {:error-fn (fn [{:keys [spec type cause msg option] :as data}]
                                         (if (= :org.babashka/cli type)
-                                          (println msg)
+                                          (.println *err* msg)
                                           (throw (ex-info msg data)))
                                         (System/exit 1))
                             :prog "auto-timesheet"
