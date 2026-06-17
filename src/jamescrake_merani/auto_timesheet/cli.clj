@@ -73,5 +73,7 @@
                                         (if (= :org.babashka/cli type)
                                           (println msg)
                                           (throw (ex-info msg data)))
-                                        (System/exit 1))}))
+                                        (System/exit 1))
+                            :prog "auto-timesheet"
+                            :help true}))
 
