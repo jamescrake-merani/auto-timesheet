@@ -69,6 +69,6 @@
         (sut/manual-entry db clock-start clock-end "test"))
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
       (t/is (= (count (db-raw/all-clocks db)) (:expected-remaining-clocks datum)))
-      (t/is (= (count (db-raw/clocks-within-timeperiod (:periodstart (first (:period datum))
-                                                                     (second (:period datum)))))
+      (t/is (= (count (db-raw/clocks-within-timeperiod db {:periodstart (first (:period datum))
+                                                           :periodend (second (:period datum))}))
                0)))))
