@@ -68,6 +68,13 @@ from clockin as i
 join clockout as o on i.clockoutid = o.clockoutid 
 where i.starttime >= :periodstart and i.starttime <= :periodend
 
+-- :name all-clocks
+-- :command :execute
+-- :result :many
+select *
+from clockin as i;
+join clockout as o on i.clockoutid = o.clockoutid;
+
 -- :name delete-clockouts-within-timeperiod
 -- :command :execute
 -- :result :raw
