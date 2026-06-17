@@ -20,9 +20,10 @@
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [_]
-  (helpers/clock-out @db)
-  ;; TODO: Might want to show some more detail?
-  (println "Clocked out"))
+  (let [time-since-clockin (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse)]
+    (helpers/clock-out @db)
+    (println (format "Clocked out. You have worked %s"
+                     (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
