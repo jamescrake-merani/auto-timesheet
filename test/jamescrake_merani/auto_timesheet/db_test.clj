@@ -64,8 +64,9 @@
 (t/deftest deletion-test
   (let [db (db-init/open-database ":memory:")]
     (doseq [datum deletion-clock-test-data]
+      (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end))
+        (sut/manual-entry db clock-start clock-end "test"))
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
       (t/is (= (count (db-raw/all-clocks db)) (:expected-remaining-clocks datum)))
       (t/is (= (count (db-raw/clocks-within-timeperiod (:periodstart (first (:period datum))
