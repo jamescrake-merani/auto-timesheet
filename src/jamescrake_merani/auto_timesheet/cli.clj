@@ -58,7 +58,7 @@
 
 (defn no-command [_]
   (print-status)
-  (println "Run 'auto-timesheet help' for a list of all commands."))
+  (println "Run 'auto-timesheet --help' for a list of all commands."))
 
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
@@ -73,5 +73,7 @@
                                         (if (= :org.babashka/cli type)
                                           (println msg)
                                           (throw (ex-info msg data)))
-                                        (System/exit 1))}))
+                                        (System/exit 1))
+                            :prog "auto-timesheet"
+                            :help true}))
 
