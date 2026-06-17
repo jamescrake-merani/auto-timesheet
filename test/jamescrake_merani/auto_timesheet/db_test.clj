@@ -62,8 +62,8 @@
     :expected-remaining-clocks 0}])
 
 (t/deftest deletion-test
-  (let [db (db-init/open-database ":memory:")]
-    (doseq [datum deletion-clock-test-data]
+  (doseq [datum deletion-clock-test-data]
+    (let [db (db-init/open-database ":memory:")]
       (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
