@@ -56,3 +56,23 @@
                                    :periodend (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))}))]
         (verify-duration full-clock (nth datum 2))))))
 
+(def deletion-clock-test-data
+  [{:clocks [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 15 00)]]
+    :period [(LocalDateTime/of 2026 6 11 00 00) (LocalDateTime/of 2026 6 11 20 00)]
+    :expected-remaining-clocks 0}])
+
+(t/deftest deletion-test
+  (let [db (db-init/open-database ":memory:")]
+    (doseq [datum deletion-clock-test-data]
+      (doseq [[clock-start clock-end] (:clocks datum)]
+        (sut/manual-entry db clock-start clock-end))
+      (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
+      (t/is (= (count (db-raw/all-clocks db)) (:expected-remaining-clocks datum)))
+      (t/is (= (count (db-raw/clocks-within-timeperiod (:periodstart (first (:period datum))
+                                                                     (second (:period datum)))))
+               0)))))
+
+
+
+
+
