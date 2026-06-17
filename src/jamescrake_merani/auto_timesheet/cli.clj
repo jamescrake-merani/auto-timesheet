@@ -21,7 +21,7 @@
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [_]
   (let [hanging-clockins (as-db/hanging-clockins @db)
-        time-since-clockin (if hanging-clockins
+        time-since-clockin (when (not (empty? hanging-clockins))
                              (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
     (when (empty? hanging-clockins)
       (.println *err* "You are not clocked in.")
