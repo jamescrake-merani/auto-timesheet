@@ -37,7 +37,8 @@
   (conj (format "Total work completed: %s" (-> grouped-clocks
                                                vals
                                                flatten
-                                               sum-clocks))
+                                               sum-clocks
+                                               format-clock))
         (reduce-kv (fn [lines day clocks]
                      (into lines (day-summary day clocks)))
                    [] grouped-clocks)))
