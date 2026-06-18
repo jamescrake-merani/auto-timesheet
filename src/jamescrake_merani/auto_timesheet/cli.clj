@@ -68,8 +68,11 @@
   (println
    (str/join "\n"
              (map (fn [clock]
-                    (format-duration (Duration/between (LocalDateTime/parse (:starttime clock))
-                                                       (LocalDateTime/parse (:stoptime clock)))))
+                    (format "%s - %s %s"
+                            (:starttime clock)
+                            (:stoptime clock)
+                            (format-duration (Duration/between (LocalDateTime/parse (:starttime clock))
+                                                               (LocalDateTime/parse (:stoptime clock))))))
                   clocks))))
 
 (def delete-range-spec
