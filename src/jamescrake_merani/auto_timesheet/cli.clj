@@ -8,7 +8,8 @@
             [clojure.string :as str])
   (:import (dev.dirs ProjectDirectories)
            (java.time Duration
-                      LocalDateTime))
+                      LocalDateTime
+                      LocalDate))
   (:gen-class))
 
 (def directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
@@ -61,6 +62,29 @@
        (format "You are currently clocked in. %s elapsed since clockin."
                (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
                                                   (LocalDateTime/now))))))))
+
+(defn print-clocks [clocks]
+  (println
+   (str/join "\n"
+             (map (fn [clock]
+                    (format-duration (Duration/between (:starttime clock) (:stoptime clock))))))))
+
+;; TODO: Right now this only works for today. Possibly specify a date as well.
+(defn delete-range-command [{{:keys [start-time end-time]} :opts}]
+  (let [period-start (LocalDateTime/of (LocalDate/now) start-time)
+        period-end (LocalDateTime/of (LocalDate/now) end-time)
+        to-remove
+        (as-db/clocks-within-timeperiod
+         db
+         {:periodstart period-start
+          :periodend period-end})]
+    (print-clocks to-remove)
+    (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
+    (if (= (str/trim (read-line)) "y")
+      (do
+        (helpers/delete-clocks db period-start period-end)
+        (println "Deleted."))
+      (println "Cancelled."))))
 
 (defn status-command [_]
   (print-status))
