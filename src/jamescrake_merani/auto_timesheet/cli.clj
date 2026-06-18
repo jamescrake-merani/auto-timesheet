@@ -26,7 +26,7 @@
         time-since-clockin (when (not (empty? hanging-clockins))
                              (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
     (when (empty? hanging-clockins)
-      (.println *err* "You are not clocked in.")
+      (.println ^java.io.PrintWriter *err* "You are not clocked in.")
       (System/exit 1))
     (helpers/clock-out @db)
     (println (format "Clocked out. You have worked %s"
@@ -37,7 +37,7 @@
 (defn clockin [{{:keys [category]} :opts}]
   (cond
     (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
-    (nil? category) (do (.println *err*  "You need to provide a category with clock ins.")
+    (nil? category) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins.")
                         (System/exit 1))
     :else (do
             (helpers/clock-in @db category)
@@ -51,7 +51,7 @@
   (let [report-function (get reports-available (keyword type))]
     (if (nil? report-function)
       (do
-        (.println *err* "That report type does not exist.")
+        (.println ^java.io.PrintWriter *err* "That report type does not exist.")
         (System/exit 1))
       (println (->> @db report-function flatten (str/join "\n"))))))
 
@@ -92,7 +92,7 @@
           :periodend period-end})]
     (if (empty? to-remove)
       (do
-        (.println *err* "No clocks were found in the period you specified.")
+        (.println ^java.io.PrintWriter *err* "No clocks were found in the period you specified.")
         (System/exit 1))
       (do
         (print-clocks to-remove)
@@ -122,7 +122,7 @@
 (defn -main [& args]
   (cli/dispatch table args {:error-fn (fn [{:keys [spec type cause msg option] :as data}]
                                         (if (= :org.babashka/cli type)
-                                          (.println *err* msg)
+                                          (.println ^java.io.PrintWriter *err* msg)
                                           (throw (ex-info msg data)))
                                         (System/exit 1))
                             :prog "auto-timesheet"
