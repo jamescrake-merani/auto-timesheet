@@ -3,7 +3,8 @@
   (:import (java.time LocalDateTime
                       LocalDate
                       LocalTime
-                      DayOfWeek)))
+                      DayOfWeek
+                      Duration)))
 
 (defn clock-in
   ([db category] (clock-in db category (LocalDateTime/now)))
@@ -72,4 +73,10 @@
      (.toLocalDate (LocalDateTime/parse (:starttime clock))))
    clocks))
 
+;; Returns duration.
+(defn sum-clocks [clocks]
+  (reduce #(.plus ^java.time.Duration %1
+                  (Duration/between (LocalDateTime/parse (:starttime %2))
+                                    (LocalDateTime/parse (:stoptime %2))))
+          Duration/ZERO clocks))
 

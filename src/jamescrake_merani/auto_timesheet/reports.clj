@@ -7,7 +7,7 @@
            (java.util Locale)
            (java.time.format TextStyle))
   (:require [clojure.string :as str]
-            [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week]]))
+            [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week sum-clocks]]))
 
 (defn format-duration [^java.time.Duration d]
   (format "%d hours, %d minutes"
@@ -34,9 +34,15 @@
 
 ;; TODO: Add weekly total.
 (defn human-readable-summary [grouped-clocks]
-  (reduce-kv (fn [lines day clocks]
-               (into lines (day-summary day clocks)))
-             [] grouped-clocks))
+  (conj
+   (reduce-kv (fn [lines day clocks]
+                (into lines (day-summary day clocks)))
+              [] grouped-clocks)
+   (format "Total work completed: %s" (-> grouped-clocks
+                                          vals
+                                          flatten
+                                          sum-clocks
+                                          format-duration))))
 
 ;; TODO: Reports should be able to take in parameters. For now, we need to use
 ;; sensible defaults.
