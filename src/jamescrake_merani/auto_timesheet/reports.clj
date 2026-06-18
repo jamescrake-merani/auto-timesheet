@@ -38,7 +38,7 @@
                                                vals
                                                flatten
                                                sum-clocks
-                                               format-clock))
+                                               format-duration))
         (reduce-kv (fn [lines day clocks]
                      (into lines (day-summary day clocks)))
                    [] grouped-clocks)))
