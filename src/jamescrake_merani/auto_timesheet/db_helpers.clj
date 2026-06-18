@@ -75,5 +75,8 @@
 
 ;; Returns duration.
 (defn sum-clocks [clocks]
-  (reduce #(.plus %1 (Duration/between (LocalDateTime/parse (:starttime %2)) (LocalDateTime/parse (:stoptime %2)))) Duration/ZERO clocks))
+  (reduce #(.plus ^java.time.Duration %1
+                  (Duration/between (LocalDateTime/parse (:starttime %2))
+                                    (LocalDateTime/parse (:stoptime %2))))
+          Duration/ZERO clocks))
 
