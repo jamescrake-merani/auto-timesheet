@@ -57,9 +57,50 @@
         (verify-duration full-clock (nth datum 2))))))
 
 (def deletion-clock-test-data
-  [{:clocks [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 15 00)]]
+  [;; Single clock fully within deletion period
+   {:clocks [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 15 00)]]
     :period [(LocalDateTime/of 2026 6 11 00 00) (LocalDateTime/of 2026 6 11 20 00)]
-    :expected-remaining-clocks 0}])
+    :expected-remaining-clocks 0}
+   ;; Multiple clocks, all within the deletion period
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 9 00)]
+             [(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 16 00)]]
+    :period [(LocalDateTime/of 2026 6 11 00 00) (LocalDateTime/of 2026 6 11 23 59)]
+    :expected-remaining-clocks 0}
+   ;; Single clock starts before the deletion period — should survive
+   {:clocks [[(LocalDateTime/of 2026 6 10 22 00) (LocalDateTime/of 2026 6 10 23 00)]]
+    :period [(LocalDateTime/of 2026 6 11 00 00) (LocalDateTime/of 2026 6 11 23 59)]
+    :expected-remaining-clocks 1}
+   ;; Two clocks: one inside period (deleted), one outside (survives)
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 10 00)]
+             [(LocalDateTime/of 2026 6 12 9 00) (LocalDateTime/of 2026 6 12 10 00)]]
+    :period [(LocalDateTime/of 2026 6 11 00 00) (LocalDateTime/of 2026 6 11 23 59)]
+    :expected-remaining-clocks 1}
+   ;; Clock starting exactly on the period start boundary — should be deleted
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 9 30)]]
+    :period [(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 17 00)]
+    :expected-remaining-clocks 0}
+   ;; Clock starting exactly on the period end boundary — should be deleted
+   {:clocks [[(LocalDateTime/of 2026 6 11 17 00) (LocalDateTime/of 2026 6 11 18 00)]]
+    :period [(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 17 00)]
+    :expected-remaining-clocks 0}
+   ;; Three clocks across multiple days, period covers only the middle day
+   {:clocks [[(LocalDateTime/of 2026 6 10 14 00) (LocalDateTime/of 2026 6 10 16 00)]
+             [(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 12 10 00) (LocalDateTime/of 2026 6 12 11 00)]]
+    :period [(LocalDateTime/of 2026 6 11 00 00) (LocalDateTime/of 2026 6 11 23 59)]
+    :expected-remaining-clocks 2}
+   ;; Narrow deletion window removes only the matching clock
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 9 00)]
+             [(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 11 00)]
+             [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 15 00)]]
+    :period [(LocalDateTime/of 2026 6 11 9 30) (LocalDateTime/of 2026 6 11 12 00)]
+    :expected-remaining-clocks 2}
+   ;; Deletion period matches no clocks — all survive
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 9 00)]
+             [(LocalDateTime/of 2026 6 11 15 00) (LocalDateTime/of 2026 6 11 16 00)]]
+    :period [(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 14 00)]
+    :expected-remaining-clocks 2}])
 
 (t/deftest deletion-test
   (doseq [datum deletion-clock-test-data]
