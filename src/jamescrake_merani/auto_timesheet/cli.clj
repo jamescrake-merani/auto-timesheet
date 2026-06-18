@@ -9,7 +9,8 @@
   (:import (dev.dirs ProjectDirectories)
            (java.time Duration
                       LocalDateTime
-                      LocalDate))
+                      LocalDate
+                      LocalTime))
   (:gen-class))
 
 (def directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
@@ -71,8 +72,8 @@
 
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command [{{:keys [start-time end-time]} :opts}]
-  (let [period-start (LocalDateTime/of (LocalDate/now) start-time)
-        period-end (LocalDateTime/of (LocalDate/now) end-time)
+  (let [period-start (LocalDateTime/of (LocalDate/now) (LocalTime/parse start-time))
+        period-end (LocalDateTime/of (LocalDate/now) (LocalTime/parse end-time))
         to-remove
         (as-db/clocks-within-timeperiod
          db
