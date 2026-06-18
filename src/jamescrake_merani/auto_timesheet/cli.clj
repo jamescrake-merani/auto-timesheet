@@ -79,12 +79,14 @@
   {:start-time {:alias :s
                 :require true}
    :end-time {:alias :e
-              :require true}})
+              :require true}
+   :date {:alias :d}})
 
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
-(defn delete-range-command [{{:keys [start-time end-time]} :opts}]
-  (let [period-start (LocalDateTime/of (LocalDate/now) (LocalTime/parse start-time))
-        period-end (LocalDateTime/of (LocalDate/now) (LocalTime/parse end-time))
+(defn delete-range-command [{{:keys [start-time end-time date]} :opts}]
+  (let [period-date (if (nil? date) (LocalDate/now) (LocalDate/parse date))
+        period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
+        period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
         to-remove
         (as-db/clocks-within-timeperiod
          @db
