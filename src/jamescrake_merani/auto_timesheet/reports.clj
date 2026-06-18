@@ -34,14 +34,15 @@
 
 ;; TODO: Add weekly total.
 (defn human-readable-summary [grouped-clocks]
-  (conj (format "Total work completed: %s" (-> grouped-clocks
-                                               vals
-                                               flatten
-                                               sum-clocks
-                                               format-duration))
-        (reduce-kv (fn [lines day clocks]
-                     (into lines (day-summary day clocks)))
-                   [] grouped-clocks)))
+  (conj
+   (reduce-kv (fn [lines day clocks]
+                (into lines (day-summary day clocks)))
+              [] grouped-clocks)
+   (format "Total work completed: %s" (-> grouped-clocks
+                                          vals
+                                          flatten
+                                          sum-clocks
+                                          format-duration))))
 
 ;; TODO: Reports should be able to take in parameters. For now, we need to use
 ;; sensible defaults.
