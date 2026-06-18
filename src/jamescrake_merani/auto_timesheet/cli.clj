@@ -82,14 +82,14 @@
         period-end (LocalDateTime/of (LocalDate/now) (LocalTime/parse end-time))
         to-remove
         (as-db/clocks-within-timeperiod
-         db
+         @db
          {:periodstart period-start
           :periodend period-end})]
     (print-clocks to-remove)
     (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
     (if (= (str/trim (read-line)) "y")
       (do
-        (helpers/delete-clocks db period-start period-end)
+        (helpers/delete-clocks @db period-start period-end)
         (println "Deleted."))
       (println "Cancelled."))))
 
