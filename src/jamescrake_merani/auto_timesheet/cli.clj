@@ -8,7 +8,9 @@
             [clojure.string :as str])
   (:import (dev.dirs ProjectDirectories)
            (java.time Duration
-                      LocalDateTime))
+                      LocalDateTime
+                      LocalDate
+                      LocalTime))
   (:gen-class))
 
 (def directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
@@ -24,7 +26,7 @@
         time-since-clockin (when (not (empty? hanging-clockins))
                              (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
     (when (empty? hanging-clockins)
-      (.println *err* "You are not clocked in.")
+      (.println ^java.io.PrintWriter *err* "You are not clocked in.")
       (System/exit 1))
     (helpers/clock-out @db)
     (println (format "Clocked out. You have worked %s"
@@ -35,7 +37,7 @@
 (defn clockin [{{:keys [category]} :opts}]
   (cond
     (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
-    (nil? category) (do (.println *err*  "You need to provide a category with clock ins.")
+    (nil? category) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins.")
                         (System/exit 1))
     :else (do
             (helpers/clock-in @db category)
@@ -49,7 +51,7 @@
   (let [report-function (get reports-available (keyword type))]
     (if (nil? report-function)
       (do
-        (.println *err* "That report type does not exist.")
+        (.println ^java.io.PrintWriter *err* "That report type does not exist.")
         (System/exit 1))
       (println (->> @db report-function flatten (str/join "\n"))))))
 
@@ -61,6 +63,47 @@
        (format "You are currently clocked in. %s elapsed since clockin."
                (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
                                                   (LocalDateTime/now))))))))
+
+(defn print-clocks [clocks]
+  (println
+   (str/join "\n"
+             (map (fn [clock]
+                    (format "%s - %s %s"
+                            (:starttime clock)
+                            (:stoptime clock)
+                            (format-duration (Duration/between (LocalDateTime/parse (:starttime clock))
+                                                               (LocalDateTime/parse (:stoptime clock))))))
+                  clocks))))
+
+(def delete-range-spec
+  {:start-time {:alias :s
+                :require true}
+   :end-time {:alias :e
+              :require true}
+   :date {:alias :d}})
+
+;; TODO: Right now this only works for today. Possibly specify a date as well.
+(defn delete-range-command [{{:keys [start-time end-time date]} :opts}]
+  (let [period-date (if (nil? date) (LocalDate/now) (LocalDate/parse date))
+        period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
+        period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
+        to-remove
+        (as-db/clocks-within-timeperiod
+         @db
+         {:periodstart period-start
+          :periodend period-end})]
+    (if (empty? to-remove)
+      (do
+        (.println ^java.io.PrintWriter *err* "No clocks were found in the period you specified.")
+        (System/exit 1))
+      (do
+        (print-clocks to-remove)
+        (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
+        (if (= (str/trim (read-line)) "y")
+          (do
+            (helpers/delete-clocks @db period-start period-end)
+            (println "Deleted."))
+          (println "Cancelled."))))))
 
 (defn status-command [_]
   (print-status))
@@ -74,13 +117,14 @@
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
+   {:cmds ["delete-range"] :fn delete-range-command :spec delete-range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
 (defn -main [& args]
   (cli/dispatch table args {:error-fn (fn [{:keys [spec type cause msg option] :as data}]
                                         (if (= :org.babashka/cli type)
-                                          (.println *err* msg)
+                                          (.println ^java.io.PrintWriter *err* msg)
                                           (throw (ex-info msg data)))
                                         (System/exit 1))
                             :prog "auto-timesheet"
