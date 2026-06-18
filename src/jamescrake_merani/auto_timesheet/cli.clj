@@ -70,6 +70,12 @@
              (map (fn [clock]
                     (format-duration (Duration/between (:starttime clock) (:stoptime clock))))))))
 
+(def delete-range-spec
+  {:start-time {:alias :s
+                :require true}
+   :end-time {:alias :e
+              :require true}})
+
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command [{{:keys [start-time end-time]} :opts}]
   (let [period-start (LocalDateTime/of (LocalDate/now) (LocalTime/parse start-time))
@@ -99,7 +105,7 @@
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
-   {:cmds ["delete-range" :fn delete-range-command :doc "Deletes clocks within a specified range during today."]}
+   {:cmds ["delete-range" :fn delete-range-command :spec delete-range-command :doc "Deletes clocks within a specified range during today."]}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
