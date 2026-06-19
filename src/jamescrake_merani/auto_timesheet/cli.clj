@@ -62,16 +62,16 @@
         (System/exit 1))
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
+(defn format-clockin [clockin]
+  (format "You are currently clocked into %s. %s elapsed since clockin."
+          (:name (as-db/get-category-name-from-id @db {:id (:categoryid clockin)}))
+          (format-duration (Duration/between (LocalDateTime/parse (:starttime clockin))
+                                             (LocalDateTime/now)))))
+
 (defn print-status []
   (let [hanging-clockins (as-db/hanging-clockins @db)]
-    (cond (empty? hanging-clockins)
-          (println "You are not currently clocked in.")
-          (= (count hanging-clockins) 1)
-          (println
-           (format "You are currently clocked into %s. %s elapsed since clockin."
-                   (:name (as-db/get-category-name-from-id @db {:id (:categoryid (first hanging-clockins))}))
-                   (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
-                                                      (LocalDateTime/now)))))
+    (cond (empty? hanging-clockins) (println "You are not currently clocked in.")
+          (= (count hanging-clockins) 1) (println (format-clockin (first hanging-clockins)))
           :else (println "You have multiple clock ins"))))
 
 ;; TODO: Display all clock ins.
