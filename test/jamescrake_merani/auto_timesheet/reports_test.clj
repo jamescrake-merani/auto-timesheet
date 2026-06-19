@@ -94,7 +94,7 @@
 
 (t/deftest human-readable-report-category-filter-test
   (doseq [datum-map category-filter-test-date]
-    (let [db (setup-db)]
+    (let [db (db-init/open-database ":memory:")]
       (doseq [to-add-key (keys datum-map)]
         (doseq [[start end] (get to-add-key datum-map)]
           (helpers/manual-entry db start end (str to-add-key))))
