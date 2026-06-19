@@ -49,7 +49,7 @@
 (defn human-readable-report
   ([db] (human-readable-report db (constantly true) (LocalDateTime/now)))
   ([db filter-function] (human-readable-report db filter-function (LocalDateTime/now)))
-  ([db filter-function date] (-> db (clocks-in-week date) filter-function group-clocks-by-day human-readable-summary)))
+  ([db filter-function date] (->> (clocks-in-week db date) (filter filter-function) group-clocks-by-day human-readable-summary)))
 
 (def reports-available
   {:human-readable human-readable-report})
