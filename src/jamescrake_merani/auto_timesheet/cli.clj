@@ -64,12 +64,16 @@
 
 (defn print-status []
   (let [hanging-clockins (as-db/hanging-clockins @db)]
-    (if (empty? hanging-clockins)
-      (println "You are not currently clocked in.")
-      (println
-       (format "You are currently clocked in. %s elapsed since clockin."
-               (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
-                                                  (LocalDateTime/now))))))))
+    (cond (empty? hanging-clockins)
+          (println "You are not currently clocked in.")
+          (= (count hanging-clockins) 1)
+          (println
+           (format "You are currently clocked in. %s elapsed since clockin."
+                   (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
+                                                      (LocalDateTime/now)))))
+          :else (println "You have multiple clock ins"))))
+
+;; TODO: Display all clock ins.
 
 (defn print-clocks [clocks]
   (println
