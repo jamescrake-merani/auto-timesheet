@@ -86,18 +86,18 @@
       (let [db (setup-db entries)]
         (t/is (= expected (report-string db ref-date)))))))
 
-(def category-filter-test-date
+(def category-filter-test-data
   [{:data {:work ["2026-06-08T09:00"  "2026-06-08T17:00"]
            :personal ["2026-06-08T18:00" "2026-06-08T21:00"]}
     :expected {:work "Monday:\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"
                :personal "Monday:\n18:00-21:00 (3 hours, 0 minutes)\nTotal work completed: 3 hours, 0 minutes"}}])
 
 (t/deftest human-readable-report-category-filter-test
-  (doseq [datum-map category-filter-test-date]
+  (doseq [datum-map category-filter-test-data]
     (let [db (db-init/open-database ":memory:")]
       (doseq [to-add-key (keys datum-map)]
         (doseq [[start end] (get to-add-key datum-map)]
           (helpers/manual-entry db start end (str to-add-key))))
       (doseq [category (keys datum-map)]
-        (t/is (= (-> category-filter-test-date :expected (get (keyword category)))
+        (t/is (= (-> category-filter-test-data :expected (get (keyword category)))
                  (report-string db "2026-06-08T00:00")))))))
