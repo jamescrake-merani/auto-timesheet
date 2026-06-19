@@ -99,5 +99,5 @@
         (doseq [[start end] (get to-add-key datum-map)]
           (helpers/manual-entry db start end (str to-add-key))))
       (doseq [category (keys datum-map)]
-        (t/is (= (-> category-filter-test-date :expected category)
+        (t/is (= (-> category-filter-test-date :expected (get (keyword category)))
                  (report-string db "2026-06-08T00:00")))))))
