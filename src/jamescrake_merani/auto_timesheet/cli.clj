@@ -19,7 +19,7 @@
 
 (def clock-spec
   {:category {:alias :c}
-   :force {:alias :c
+   :force {:alias :f
            :coerce :boolean
            :desc "Create a clock in even if there already is one."}})
 
