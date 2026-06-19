@@ -68,7 +68,8 @@
           (println "You are not currently clocked in.")
           (= (count hanging-clockins) 1)
           (println
-           (format "You are currently clocked in. %s elapsed since clockin."
+           (format "You are currently clocked into %s. %s elapsed since clockin."
+                   (:name (as-db/get-category-name-from-id @db {:id (:categoryid (first hanging-clockins))}))
                    (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
                                                       (LocalDateTime/now)))))
           :else (println "You have multiple clock ins"))))
