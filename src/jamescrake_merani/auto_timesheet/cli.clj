@@ -39,7 +39,7 @@
             (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category.")
             (System/exit 1))
           :else (let [category-id (as-db/get-category-from-name @db {:name category})]
-                  (helpers/clock-out @db (:clockinid (first (filter #(= (:categoryid) category-id) hanging-clockins))))))
+                  (helpers/clock-out @db (:clockinid (first (filter #(= (:categoryid %) category-id) hanging-clockins))))))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
