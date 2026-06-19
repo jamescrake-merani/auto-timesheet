@@ -97,6 +97,12 @@ where starttime >= :periodstart and starttime <= :periodend;
 select categoryid from category
 where :name = name;
 
+-- :name get-category-name-from-id
+-- :command :execute
+-- :result :one
+select name from category
+where :id = categoryid;
+
 -- :name create-category
 -- :command :execute
 -- :result :one
