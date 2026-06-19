@@ -45,15 +45,19 @@
 
 (def report-spec
   {:type {:alias :t
-          :require true}})
+          :require true}
+   :category {:alias :c}})
 
-(defn report [{{:keys [type]} :opts}]
-  (let [report-function (get reports-available (keyword type))]
+(defn report [{{:keys [type category]} :opts}]
+  (let [filter-function (if (nil? category)
+                          (constantly true)
+                          #(= (:categoryid %) (as-db/get-category-from-name db {:name category})))
+        report-function (get reports-available (keyword type))]
     (if (nil? report-function)
       (do
         (.println ^java.io.PrintWriter *err* "That report type does not exist.")
         (System/exit 1))
-      (println (->> @db report-function flatten (str/join "\n"))))))
+      (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
 (defn print-status []
   (let [hanging-clockins (as-db/hanging-clockins @db)]
