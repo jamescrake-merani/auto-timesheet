@@ -85,3 +85,18 @@
     (t/testing description
       (let [db (setup-db entries)]
         (t/is (= expected (report-string db ref-date)))))))
+
+(def category-filter-test-date
+  [{:data {:work ["2026-06-08T09:00"  "2026-06-08T17:00"]
+           :personal ["2026-06-08T018:00" "2026-06-08T21:00"]}
+    :expected {:work "TODO: Fill"}}])
+
+(t/deftest human-readable-report-category-filter-test
+  (doseq [datum-map category-filter-test-date]
+    (let [db (setup-db)]
+      (doseq [to-add-key (keys datum-map)]
+        (doseq [[start end] (get to-add-key datum-map)]
+          (helpers/manual-entry db start end (str to-add-key))))
+      (doseq [category (keys datum-map)]
+        (t/is (= (-> category-filter-test-date :expected category)
+                 (report-string db "2026-06-08T00:00")))))))
