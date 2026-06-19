@@ -51,4 +51,5 @@
   ([db date] (-> db (clocks-in-week date) group-clocks-by-day human-readable-summary)))
 
 (def reports-available
-  {:human-readable human-readable-report})
+  {:human-readable {:fn human-readable-report
+                    :params [:category]}})
