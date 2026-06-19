@@ -24,14 +24,22 @@
            :desc "Create a clock in even if there already is one."}})
 
 ;: TODO: Probably want to be able to provide a category.
-(defn clockout [_]
+(defn clockout [{{:keys [category]} :opts}]
   (let [hanging-clockins (as-db/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
                              (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
-    (when (empty? hanging-clockins)
-      (.println ^java.io.PrintWriter *err* "You are not clocked in.")
-      (System/exit 1))
-    (helpers/clock-out @db)
+    (cond (empty? hanging-clockins)
+          (do
+            (.println ^java.io.PrintWriter *err* "You are not clocked in.")
+            (System/exit 1))
+          (= (count hanging-clockins) 1)
+          (helpers/clock-out @db)
+          (nil? category)
+          (do
+            (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category.")
+            (System/exit 1))
+          :else (let [category-id (as-db/get-category-from-name @db)]
+                  (helpers/clock-out @db (:clockinid (first (filter #(= (:categoryid) category-id) hanging-clockins))))))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
