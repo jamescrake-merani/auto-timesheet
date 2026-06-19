@@ -18,7 +18,10 @@
 (def db (delay (open-database (io/file (.dataDir ^ProjectDirectories @directories) "data.db"))))
 
 (def clock-spec
-  {:category {:alias :c}})
+  {:category {:alias :c}
+   :force {:alias :c
+           :coerce :boolean
+           :desc "Create a clock in even if there already is one."}})
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [_]
@@ -34,9 +37,9 @@
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
-(defn clockin [{{:keys [category]} :opts}]
+(defn clockin [{{:keys [category force]} :opts}]
   (cond
-    (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
+    (not (or (empty? (as-db/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
     (nil? category) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins.")
                         (System/exit 1))
     :else (do
