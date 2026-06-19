@@ -88,8 +88,9 @@
 
 (def category-filter-test-date
   [{:data {:work ["2026-06-08T09:00"  "2026-06-08T17:00"]
-           :personal ["2026-06-08T018:00" "2026-06-08T21:00"]}
-    :expected {:work "TODO: Fill"}}])
+           :personal ["2026-06-08T18:00" "2026-06-08T21:00"]}
+    :expected {:work "Monday:\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"
+               :personal "Monday:\n18:00-21:00 (3 hours, 0 minutes)\nTotal work completed: 3 hours, 0 minutes"}}])
 
 (t/deftest human-readable-report-category-filter-test
   (doseq [datum-map category-filter-test-date]
