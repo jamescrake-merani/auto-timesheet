@@ -20,7 +20,7 @@
 
 (defn- report-string
   [db date-str]
-  (->> (sut/human-readable-report db (LocalDateTime/parse date-str))
+  (->> (sut/human-readable-report db (constantly true) (LocalDateTime/parse date-str))
        flatten
        (str/join "\n")))
 
