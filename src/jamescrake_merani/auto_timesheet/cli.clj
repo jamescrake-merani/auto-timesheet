@@ -72,7 +72,10 @@
   (let [hanging-clockins (as-db/hanging-clockins @db)]
     (cond (empty? hanging-clockins) (println "You are not currently clocked in.")
           (= (count hanging-clockins) 1) (println (format-clockin (first hanging-clockins)))
-          :else (println "You have multiple clock ins"))))
+          :else (do
+                  (println "You have multiple clock ins:")
+                  (doseq [clockin hanging-clockins]
+                    (println (format-clockin clockin)))))))
 
 ;; TODO: Display all clock ins.
 
