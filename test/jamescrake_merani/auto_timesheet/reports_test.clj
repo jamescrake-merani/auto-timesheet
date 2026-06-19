@@ -20,7 +20,7 @@
 
 (defn- report-string
   [db date-str]
-  (->> (sut/human-readable-report db (LocalDateTime/parse date-str))
+  (->> (sut/human-readable-report db (constantly true) (LocalDateTime/parse date-str))
        flatten
        (str/join "\n")))
 
@@ -85,3 +85,57 @@
     (t/testing description
       (let [db (setup-db entries)]
         (t/is (= expected (report-string db ref-date)))))))
+
+(def category-filter-test-data
+  [;; Two categories, single entry each, same day
+   {:data {:work [["2026-06-08T09:00"  "2026-06-08T17:00"]]
+            :personal [["2026-06-08T18:00" "2026-06-08T21:00"]]}
+    :expected {:work "Monday:\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"
+               :personal "Monday:\n18:00-21:00 (3 hours, 0 minutes)\nTotal work completed: 3 hours, 0 minutes"}}
+
+   ;; Multiple entries per category across different days
+   {:data {:work [["2026-06-08T09:00" "2026-06-08T12:00"]
+                   ["2026-06-09T14:00" "2026-06-09T18:00"]]
+            :personal [["2026-06-10T10:00" "2026-06-10T11:30"]
+                        ["2026-06-10T13:00" "2026-06-10T14:00"]]}
+    :expected {:work "Monday:\n09:00-12:00 (3 hours, 0 minutes)\nTuesday:\n14:00-18:00 (4 hours, 0 minutes)\nTotal work completed: 7 hours, 0 minutes"
+               :personal "Wednesday:\n10:00-11:30 (1 hours, 30 minutes)\n13:00-14:00 (1 hours, 0 minutes)\nTotal work completed: 2 hours, 30 minutes"}}
+
+   ;; Three categories
+   {:data {:work [["2026-06-08T08:00" "2026-06-08T12:00"]]
+            :personal [["2026-06-08T18:00" "2026-06-08T19:30"]]
+            :study [["2026-06-09T09:00" "2026-06-09T11:00"]]}
+    :expected {:work "Monday:\n08:00-12:00 (4 hours, 0 minutes)\nTotal work completed: 4 hours, 0 minutes"
+               :personal "Monday:\n18:00-19:30 (1 hours, 30 minutes)\nTotal work completed: 1 hours, 30 minutes"
+               :study "Tuesday:\n09:00-11:00 (2 hours, 0 minutes)\nTotal work completed: 2 hours, 0 minutes"}}
+
+   ;; Single category — no other categories in the database
+   {:data {:work [["2026-06-11T06:00" "2026-06-11T06:45"]]}
+    :expected {:work "Thursday:\n06:00-06:45 (0 hours, 45 minutes)\nTotal work completed: 0 hours, 45 minutes"}}
+
+   ;; Both categories have entries on the same days
+   {:data {:work [["2026-06-08T09:00" "2026-06-08T12:00"]
+                   ["2026-06-09T09:00" "2026-06-09T12:00"]]
+            :personal [["2026-06-08T13:00" "2026-06-08T15:00"]
+                        ["2026-06-09T13:00" "2026-06-09T14:30"]]}
+    :expected {:work "Monday:\n09:00-12:00 (3 hours, 0 minutes)\nTuesday:\n09:00-12:00 (3 hours, 0 minutes)\nTotal work completed: 6 hours, 0 minutes"
+               :personal "Monday:\n13:00-15:00 (2 hours, 0 minutes)\nTuesday:\n13:00-14:30 (1 hours, 30 minutes)\nTotal work completed: 3 hours, 30 minutes"}}])
+
+(t/deftest human-readable-report-category-filter-test
+  (doseq [datum-map category-filter-test-data]
+    (let [db (db-init/open-database ":memory:")]
+      (doseq [to-add-key (keys (:data datum-map))]
+        (as-db/create-category db {:name (name to-add-key)})
+        (doseq [[start end] (get (:data datum-map) to-add-key)]
+          (helpers/manual-entry db
+                                (LocalDateTime/parse start)
+                                (LocalDateTime/parse end)
+                                (name to-add-key))))
+      (doseq [category (keys (:data datum-map))]
+        (let [cat-id (:categoryid (as-db/get-category-from-name db {:name (name category)}))]
+          (t/is (= (get (:expected datum-map) category)
+                   (->> (sut/human-readable-report db
+                          #(= cat-id (:categoryid %))
+                          (LocalDateTime/parse "2026-06-08T00:00"))
+                        flatten
+                        (str/join "\n")))))))))

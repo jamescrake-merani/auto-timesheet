@@ -27,8 +27,7 @@
          :ns-compile [main]
          :manifest {"Enable-Native-Access" "ALL-UNNAMED"}))
 
-(defn ci "Run the CI pipeline of tests (and build the uberjar)." [opts]
-  (test opts)
+(defn uberjar "Just build the uberjar" [opts]
   (b/delete {:path "target"})
   (let [opts (uber-opts opts)]
     (println "\nCopying source...")
@@ -38,3 +37,7 @@
     (println "\nBuilding JAR..." (:uber-file opts))
     (b/uber opts))
   opts)
+
+(defn ci "Run the CI pipeline of tests (and build the uberjar)." [opts]
+  (test opts)
+  (uberjar opts))

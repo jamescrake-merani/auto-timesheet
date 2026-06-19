@@ -47,8 +47,9 @@
 ;; TODO: Reports should be able to take in parameters. For now, we need to use
 ;; sensible defaults.
 (defn human-readable-report
-  ([db] (human-readable-report db (LocalDateTime/now)))
-  ([db date] (-> db (clocks-in-week date) group-clocks-by-day human-readable-summary)))
+  ([db] (human-readable-report db (constantly true) (LocalDateTime/now)))
+  ([db filter-function] (human-readable-report db filter-function (LocalDateTime/now)))
+  ([db filter-function date] (->> (clocks-in-week db date) (filter filter-function) group-clocks-by-day human-readable-summary)))
 
 (def reports-available
   {:human-readable human-readable-report})
