@@ -95,9 +95,9 @@
 (t/deftest human-readable-report-category-filter-test
   (doseq [datum-map category-filter-test-data]
     (let [db (db-init/open-database ":memory:")]
-      (doseq [to-add-key (keys datum-map)]
-        (doseq [[start end] (get to-add-key datum-map)]
+      (doseq [to-add-key (keys (:data datum-map))]
+        (doseq [[start end] (get to-add-key (:data datum-map))]
           (helpers/manual-entry db start end (str to-add-key))))
-      (doseq [category (keys datum-map)]
-        (t/is (= (-> category-filter-test-data :expected (get (keyword category)))
+      (doseq [category (keys (:data datum-map))]
+        (t/is (= (-> datum-map :expected (get category))
                  (report-string db "2026-06-08T00:00")))))))
