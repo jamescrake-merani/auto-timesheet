@@ -52,5 +52,4 @@
   ([db date filter-function] (-> db (clocks-in-week date) filter-function group-clocks-by-day human-readable-summary)))
 
 (def reports-available
-  {:human-readable {:fn human-readable-report
-                    :params [:category]}})
+  {:human-readable human-readable-report})
