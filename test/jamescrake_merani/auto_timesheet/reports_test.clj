@@ -87,8 +87,8 @@
         (t/is (= expected (report-string db ref-date)))))))
 
 (def category-filter-test-data
-  [{:data {:work ["2026-06-08T09:00"  "2026-06-08T17:00"]
-           :personal ["2026-06-08T18:00" "2026-06-08T21:00"]}
+  [{:data {:work [["2026-06-08T09:00"  "2026-06-08T17:00"]]
+           :personal [["2026-06-08T18:00" "2026-06-08T21:00"]]}
     :expected {:work "Monday:\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"
                :personal "Monday:\n18:00-21:00 (3 hours, 0 minutes)\nTotal work completed: 3 hours, 0 minutes"}}])
 
@@ -96,8 +96,17 @@
   (doseq [datum-map category-filter-test-data]
     (let [db (db-init/open-database ":memory:")]
       (doseq [to-add-key (keys (:data datum-map))]
-        (doseq [[start end] (get to-add-key (:data datum-map))]
-          (helpers/manual-entry db start end (str to-add-key))))
+        (as-db/create-category db {:name (name to-add-key)})
+        (doseq [[start end] (get (:data datum-map) to-add-key)]
+          (helpers/manual-entry db
+                                (LocalDateTime/parse start)
+                                (LocalDateTime/parse end)
+                                (name to-add-key))))
       (doseq [category (keys (:data datum-map))]
-        (t/is (= (-> datum-map :expected (get category))
-                 (report-string db "2026-06-08T00:00")))))))
+        (let [cat-id (:categoryid (as-db/get-category-from-name db {:name (name category)}))]
+          (t/is (= (get (:expected datum-map) category)
+                   (->> (sut/human-readable-report db
+                          #(= cat-id (:categoryid %))
+                          (LocalDateTime/parse "2026-06-08T00:00"))
+                        flatten
+                        (str/join "\n")))))))))
