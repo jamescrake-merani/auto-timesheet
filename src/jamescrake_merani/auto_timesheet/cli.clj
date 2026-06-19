@@ -51,7 +51,7 @@
 (defn report [{{:keys [type category]} :opts}]
   (let [filter-function (if (nil? category)
                           (constantly true)
-                          #(= (:categoryid %) (as-db/get-category-from-name db {:name category})))
+                          #(= (:categoryid %) (as-db/get-category-from-name @db {:name category})))
         report-function (get reports-available (keyword type))]
     (if (nil? report-function)
       (do
