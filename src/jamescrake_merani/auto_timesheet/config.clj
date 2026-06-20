@@ -13,4 +13,4 @@
   []
   (let [config-path (io/file (.configDir ^ProjectDirectories @directories) "config.edn")
         config-contents (if (.exists config-path) (edn/read-string (slurp config-path)) {})]
-    (merge (make-default-config config-contents))))
+    (merge (make-default-config) config-contents)))
