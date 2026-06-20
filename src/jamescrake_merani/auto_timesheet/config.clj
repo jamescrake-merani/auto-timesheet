@@ -10,6 +10,7 @@
    :sql-directory (io/file (.dataDir directories) "data.db")})
 
 (defn load-config
+  []
   (->>
    (io/file (.configDir directories) "config.edn")
    slurp
