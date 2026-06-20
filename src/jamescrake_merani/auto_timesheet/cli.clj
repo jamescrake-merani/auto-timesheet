@@ -18,25 +18,36 @@
 (def db (delay (open-database (io/file (.dataDir ^ProjectDirectories @directories) "data.db"))))
 
 (def clock-spec
-  {:category {:alias :c}})
+  {:category {:alias :c}
+   :force {:alias :f
+           :coerce :boolean
+           :desc "Create a clock in even if there already is one."}})
 
 ;: TODO: Probably want to be able to provide a category.
-(defn clockout [_]
+(defn clockout [{{:keys [category]} :opts}]
   (let [hanging-clockins (as-db/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
                              (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
-    (when (empty? hanging-clockins)
-      (.println ^java.io.PrintWriter *err* "You are not clocked in.")
-      (System/exit 1))
-    (helpers/clock-out @db)
+    (cond (empty? hanging-clockins)
+          (do
+            (.println ^java.io.PrintWriter *err* "You are not clocked in.")
+            (System/exit 1))
+          (= (count hanging-clockins) 1)
+          (helpers/clock-out @db)
+          (nil? category)
+          (do
+            (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
+            (System/exit 1))
+          :else (let [category-id (as-db/get-category-from-name @db {:name category})]
+                  (helpers/clock-out @db category-id)))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
-(defn clockin [{{:keys [category]} :opts}]
+(defn clockin [{{:keys [category force]} :opts}]
   (cond
-    (not (empty? (as-db/hanging-clockins @db))) (println "You are already clocked in.")
+    (not (or (empty? (as-db/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
     (nil? category) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins.")
                         (System/exit 1))
     :else (do
@@ -59,14 +70,23 @@
         (System/exit 1))
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
+(defn format-clockin [clockin one-clockin?]
+  (format "%s %s. %s elapsed since clockin."
+          (if one-clockin? "You are currently clocked into" "You are clocked into")
+          (:name (as-db/get-category-name-from-id @db {:id (:categoryid clockin)}))
+          (format-duration (Duration/between (LocalDateTime/parse (:starttime clockin))
+                                             (LocalDateTime/now)))))
+
 (defn print-status []
   (let [hanging-clockins (as-db/hanging-clockins @db)]
-    (if (empty? hanging-clockins)
-      (println "You are not currently clocked in.")
-      (println
-       (format "You are currently clocked in. %s elapsed since clockin."
-               (format-duration (Duration/between (LocalDateTime/parse (-> hanging-clockins first :starttime))
-                                                  (LocalDateTime/now))))))))
+    (cond (empty? hanging-clockins) (println "You are not currently clocked in.")
+          (= (count hanging-clockins) 1) (println (format-clockin (first hanging-clockins) true))
+          :else (do
+                  (println "You currently have multiple clock ins:")
+                  (doseq [clockin hanging-clockins]
+                    (println (format-clockin clockin false)))))))
+
+;; TODO: Display all clock ins.
 
 (defn print-clocks [clocks]
   (println
