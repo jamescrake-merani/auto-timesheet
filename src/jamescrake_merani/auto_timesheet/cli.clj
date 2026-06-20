@@ -101,7 +101,7 @@
                                                                (LocalDateTime/parse (:stoptime clock))))))
                   clocks))))
 
-(def delete-range-spec
+(def range-spec
   {:start-time {:alias :s
                 :require true}
    :end-time {:alias :e
@@ -146,7 +146,7 @@
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
-   {:cmds ["delete-range"] :fn delete-range-command :spec delete-range-spec :doc "Deletes clocks within a specified range during today."}
+   {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
