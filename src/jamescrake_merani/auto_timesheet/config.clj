@@ -7,12 +7,12 @@
 
 (defn make-default-config []
   {:default-category nil
-   :sql-directory (io/file (.dataDir directories) "data.db")})
+   :sql-directory (io/file (.dataDir @directories) "data.db")})
 
 (defn load-config
   []
   (->>
-   (io/file (.configDir directories) "config.edn")
+   (io/file (.configDir @directories) "config.edn")
    slurp
    edn/read-string
    (merge (make-default-config))))
