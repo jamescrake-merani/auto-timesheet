@@ -36,7 +36,7 @@
           (helpers/clock-out @db)
           (nil? category)
           (do
-            (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category.")
+            (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
             (System/exit 1))
           :else (let [category-id (as-db/get-category-from-name @db {:name category})]
                   (helpers/clock-out @db category-id)))
