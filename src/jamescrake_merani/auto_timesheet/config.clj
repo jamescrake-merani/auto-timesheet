@@ -6,4 +6,4 @@
 
 (def default-config
   {:default-category nil
-   :sql-directory (io/file (.dataDir directories "data.db"))})
+   :sql-directory (io/file (.dataDir directories) "data.dir")})
