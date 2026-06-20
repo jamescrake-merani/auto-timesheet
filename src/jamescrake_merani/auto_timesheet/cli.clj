@@ -138,8 +138,12 @@
   (print-status)
   (println "Run 'auto-timesheet --help' for a list of all commands."))
 
-(defn manual-entry [{{:keys [start-time end-time]} :opts}]
-  (helpers/manual-entry @db (LocalTime/parse start-time) (LocalTime/parse end-time)))
+(defn manual-entry [{{:keys [start-time end-time date]} :opts}]
+  (let [start-local-time (LocalTime/parse start-time)
+        end-local-time (LocalTime/parse end-time)]
+    (if date
+      (helpers/manual-entry @db (LocalDateTime/of date start-local-time) (LocalDateTime/of date end-local-time))
+      (helpers/manual-entry @db start-local-time end-local-time))))
 
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
