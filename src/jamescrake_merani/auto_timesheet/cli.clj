@@ -5,17 +5,17 @@
             [clojure.java.io :as io]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
             [jamescrake-merani.auto-timesheet.reports :refer [reports-available format-duration]]
+            [jamescrake-merani.auto-timesheet.config :refer [load-config]]
             [clojure.string :as str])
-  (:import (dev.dirs ProjectDirectories)
-           (java.time Duration
+  (:import (java.time Duration
                       LocalDateTime
                       LocalDate
                       LocalTime))
   (:gen-class))
 
-(def directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
+(def config (delay (load-config)))
 ;; TODO: I'm not sure whether this should be at this level.
-(def db (delay (open-database (io/file (.dataDir ^ProjectDirectories @directories) "data.db"))))
+(def db (delay (open-database (:sql-directory @config))))
 
 (def clock-spec
   {:category {:alias :c}
