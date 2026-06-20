@@ -46,13 +46,15 @@
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
 (defn clockin [{{:keys [category force]} :opts}]
-  (cond
-    (not (or (empty? (as-db/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
-    (nil? category) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins.")
-                        (System/exit 1))
-    :else (do
-            (helpers/clock-in @db category)
-            (println "Clocked in."))))
+  (let [category-to-use (or category (:default-category @config))]
+    (cond
+      (not (or (empty? (as-db/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
+      ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
+      (nil? category-to-use) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins as you haven't provided a default one in your config.")
+                                 (System/exit 1))
+      :else (do
+              (helpers/clock-in @db category-to-use)
+              (println "Clocked in.")))))
 
 (def report-spec
   {:type {:alias :t
