@@ -11,8 +11,6 @@
 
 (defn load-config
   []
-  (->>
-   (io/file (.configDir ^ProjectDirectories @directories) "config.edn")
-   slurp
-   edn/read-string
-   (merge (make-default-config))))
+  (let [config-dir (io/file (.configDir ^ProjectDirectories @directories))
+        config-contents (if (.exists config-dir) (edn/read-string (slurp config-dir)) {})]
+    (merge (make-default-config config-contents))))
