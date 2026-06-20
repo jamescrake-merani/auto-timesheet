@@ -3,9 +3,9 @@
   (:require [clojure.java.io :as io]
             [clojure.edn :as edn]))
 
-(def ^ProjectDirectories directories (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet"))
+(def ^ProjectDirectories directories (delay (ProjectDirectories/from "me" "jamescrake-merani" "auto-timesheet")))
 
-(def default-config
+(defn make-default-config []
   {:default-category nil
    :sql-directory (io/file (.dataDir directories) "data.db")})
 
@@ -15,4 +15,4 @@
    (io/file (.configDir directories) "config.edn")
    slurp
    edn/read-string
-   (merge default-config)))
+   (merge (make-default-config))))
