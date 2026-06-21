@@ -144,9 +144,10 @@
 
 (defn manual-entry [{{:keys [start-time end-time date category]} :opts}]
   (let [start-local-time (LocalTime/parse start-time)
-        end-local-time (LocalTime/parse end-time)]
-    (if date
-      (helpers/manual-entry @db (LocalDateTime/of date start-local-time) (LocalDateTime/of date end-local-time) category)
+        end-local-time (LocalTime/parse end-time)
+        local-date (if date (LocalDate/parse date))]
+    (if local-date
+      (helpers/manual-entry @db (LocalDateTime/of local-date start-local-time) (LocalDateTime/of local-date end-local-time) category)
       (helpers/manual-entry @db start-local-time end-local-time category))))
 
 (def table
