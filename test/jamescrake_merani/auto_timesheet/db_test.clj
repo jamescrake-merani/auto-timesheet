@@ -31,8 +31,8 @@
 (defn verify-duration [clock expected-minutes]
   (t/is
    (= (.toMinutes
-       (Duration/between (LocalDateTime/parse (:starttime clock))
-                         (LocalDateTime/parse (:stoptime clock))))
+       (Duration/between (:starttime clock)
+                         (:stoptime clock)))
       expected-minutes)))
 
 (t/deftest clockin-duration-test
