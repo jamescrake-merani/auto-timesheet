@@ -38,6 +38,9 @@
 (defn- hanging-clockin-id [db]
   (-> (as-db/hanging-clockins db) first :clockinid))
 
+(defn hanging-clockins [db]
+  (map convert-clock (as-db/hanging-clockins db)))
+
 (defn clock-out
   ([db] (clock-out db (hanging-clockin-id db) (LocalDateTime/now)))
   ([db clockin-id-or-timestamp]
@@ -72,8 +75,9 @@
                                                :periodend (to-epoch period-end)}))
 
 (defn clocks-within-timeperiod [db period-start period-end]
-  (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-start)
-                                      :periodend (to-epoch period-end)}))
+  (map convert-clock
+       (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-start)
+                                           :periodend (to-epoch period-end)})))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
@@ -82,20 +86,24 @@
                                              (.with DayOfWeek/MONDAY)
                                              (.with LocalTime/MIDNIGHT))
          period-end (.plusWeeks period-beginning 1)]
-     (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-beginning)
-                                         :periodend (to-epoch period-end)}))))
+     (map convert-clock
+          (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-beginning)
+                                              :periodend (to-epoch period-end)})))))
+
+(defn all-clocks [db]
+  (map convert-clock (as-db/all-clocks db)))
 
 (defn group-clocks-by-day
   [clocks]
   (group-by
    (fn [clock]
      (.toLocalDate (:starttime clock)))
-   (map convert-clock clocks)))
+   clocks))
 
 ;; Returns duration.
 (defn sum-clocks [clocks]
   (reduce #(.plus ^java.time.Duration %1
                   (Duration/between (:starttime %2)
                                     (:stoptime %2)))
-          Duration/ZERO (map convert-clock clocks)))
+          Duration/ZERO clocks))
 
