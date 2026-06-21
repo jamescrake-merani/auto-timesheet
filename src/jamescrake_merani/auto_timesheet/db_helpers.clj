@@ -4,19 +4,27 @@
                       LocalDate
                       LocalTime
                       DayOfWeek
-                      Duration)))
+                      Duration
+                      Instant
+                      ZoneOffset)))
+
+(defn- to-epoch [^LocalDateTime ldt]
+  (.toEpochSecond ldt ZoneOffset/UTC))
+
+(defn- from-epoch [epoch-seconds]
+  (LocalDateTime/ofInstant (Instant/ofEpochSecond epoch-seconds) ZoneOffset/UTC))
 
 (defn clock-in
   ([db category] (clock-in db category (LocalDateTime/now)))
   ([db category current-timestamp]
    (cond (integer? category)
-         (as-db/clock-in db {:category-id category :starttime current-timestamp})
+         (as-db/clock-in db {:category-id category :starttime (to-epoch current-timestamp)})
          (or (keyword? category) (string? category))
          (let [category-id (as-db/get-category-from-name db {:name category})]
            (if (nil? category-id)
              (clock-in db (:categoryid (as-db/create-category db {:name category})) current-timestamp)
              (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
-                                 :starttime current-timestamp})))
+                                 :starttime (to-epoch current-timestamp)})))
          :else
          (throw (Exception. "Category needs to be an id, or a name.")))))
 
@@ -31,7 +39,7 @@
      (clock-out db (hanging-clockin-id db) clockin-id-or-timestamp)))
   ([db clockin-id current-timestamp]
    (as-db/attach-clock-out db {:clockinid clockin-id
-                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime current-timestamp}))})))
+                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime (to-epoch current-timestamp)}))})))
 
 (defn- full-date [date-or-time]
   (if (instance? LocalDateTime date-or-time)
@@ -46,15 +54,15 @@
         ;; are both times without dates but this may not always be the case.
         clockin-starttime (full-date clockin-time)
         clockout-stoptime (full-date clockout-time)]
-    (as-db/manual-clock-in db {:starttime clockin-starttime
+    (as-db/manual-clock-in db {:starttime (to-epoch clockin-starttime)
                                :category-id category-id
-                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime clockout-stoptime}))})))
+                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime (to-epoch clockout-stoptime)}))})))
 
 (defn delete-clocks [db period-start period-end]
-  (as-db/delete-clockouts-within-timeperiod db {:periodstart period-start
-                                                :periodend period-end})
-  (as-db/delete-clockins-within-timeperiod db {:periodstart period-start
-                                               :periodend period-end}))
+  (as-db/delete-clockouts-within-timeperiod db {:periodstart (to-epoch period-start)
+                                                :periodend (to-epoch period-end)})
+  (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
+                                               :periodend (to-epoch period-end)}))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
@@ -63,20 +71,20 @@
                                              (.with DayOfWeek/MONDAY)
                                              (.with LocalTime/MIDNIGHT))
          period-end (.plusWeeks period-beginning 1)]
-     (as-db/clocks-within-timeperiod db {:periodstart period-beginning
-                                         :periodend period-end}))))
+     (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-beginning)
+                                         :periodend (to-epoch period-end)}))))
 
 (defn group-clocks-by-day
   [clocks]
   (group-by
    (fn [clock]
-     (.toLocalDate (LocalDateTime/parse (:starttime clock))))
+     (.toLocalDate (from-epoch (:starttime clock))))
    clocks))
 
 ;; Returns duration.
 (defn sum-clocks [clocks]
   (reduce #(.plus ^java.time.Duration %1
-                  (Duration/between (LocalDateTime/parse (:starttime %2))
-                                    (LocalDateTime/parse (:stoptime %2))))
+                  (Duration/between (from-epoch (:starttime %2))
+                                    (from-epoch (:stoptime %2))))
           Duration/ZERO clocks))
 
