@@ -101,7 +101,7 @@
                                                                (LocalDateTime/parse (:stoptime clock))))))
                   clocks))))
 
-(def delete-range-spec
+(def range-spec
   {:start-time {:alias :s
                 :require true}
    :end-time {:alias :e
@@ -138,12 +138,25 @@
   (print-status)
   (println "Run 'auto-timesheet --help' for a list of all commands."))
 
+(def manual-entry-spec
+  (assoc range-spec :category {:alias :c
+                               :require true}))
+
+(defn manual-entry [{{:keys [start-time end-time date category]} :opts}]
+  (let [start-local-time (LocalTime/parse start-time)
+        end-local-time (LocalTime/parse end-time)
+        local-date (if date (LocalDate/parse date))]
+    (if local-date
+      (helpers/manual-entry @db (LocalDateTime/of local-date start-local-time) (LocalDateTime/of local-date end-local-time) category)
+      (helpers/manual-entry @db start-local-time end-local-time category))))
+
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
-   {:cmds ["delete-range"] :fn delete-range-command :spec delete-range-spec :doc "Deletes clocks within a specified range during today."}
+   {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
+   {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
    {:cmds [] :fn no-command :doc "No command"}])
 
 ;; TODO: Might only want to init the db for some commands later.
