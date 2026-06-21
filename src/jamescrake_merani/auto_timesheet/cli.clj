@@ -67,6 +67,10 @@
                           (constantly true)
                           #(= (:categoryid %) category-id))
         report-function (get reports-available (keyword type))]
+    (if (and category (nil? category-id))
+      (do
+        (.println ^java.io.PrintWriter *err* "That category does not exist.")
+        (System/exit 1)))
     (if (nil? report-function)
       (do
         (.println ^java.io.PrintWriter *err* "That report type does not exist.")
