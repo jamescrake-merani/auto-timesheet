@@ -140,7 +140,7 @@
 
 (def manual-entry-spec
   (assoc range-spec :category {:alias :c
-                               :required true}))
+                               :require true}))
 
 (defn manual-entry [{{:keys [start-time end-time date category]} :opts}]
   (let [start-local-time (LocalTime/parse start-time)
