@@ -27,7 +27,7 @@
 (defn clockout [{{:keys [category]} :opts}]
   (let [hanging-clockins (as-db/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
-                             (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
+                             (-> (as-db/hanging-clockins @db) first :starttime helpers/from-epoch))]
     (cond (empty? hanging-clockins)
           (do
             (.println ^java.io.PrintWriter *err* "You are not clocked in.")
@@ -76,7 +76,7 @@
   (format "%s %s. %s elapsed since clockin."
           (if one-clockin? "You are currently clocked into" "You are clocked into")
           (:name (as-db/get-category-name-from-id @db {:id (:categoryid clockin)}))
-          (format-duration (Duration/between (LocalDateTime/parse (:starttime clockin))
+          (format-duration (Duration/between (helpers/from-epoch (:starttime clockin))
                                              (LocalDateTime/now)))))
 
 (defn print-status []
@@ -97,8 +97,8 @@
                     (format "%s - %s %s"
                             (:starttime clock)
                             (:stoptime clock)
-                            (format-duration (Duration/between (LocalDateTime/parse (:starttime clock))
-                                                               (LocalDateTime/parse (:stoptime clock))))))
+                            (format-duration (Duration/between (helpers/from-epoch (:starttime clock))
+                                                               (helpers/from-epoch (:stoptime clock))))))
                   clocks))))
 
 (def range-spec
@@ -114,10 +114,10 @@
         period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
         period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
         to-remove
-        (as-db/clocks-within-timeperiod
+        (helpers/clocks-within-timeperiod
          @db
-         {:periodstart period-start
-          :periodend period-end})]
+         period-start
+         period-end)]
     (if (empty? to-remove)
       (do
         (.println ^java.io.PrintWriter *err* "No clocks were found in the period you specified.")

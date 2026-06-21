@@ -7,7 +7,7 @@
            (java.util Locale)
            (java.time.format TextStyle))
   (:require [clojure.string :as str]
-            [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week sum-clocks]]))
+            [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week sum-clocks from-epoch]]))
 
 (defn format-duration [^java.time.Duration d]
   (format "%d hours, %d minutes"
@@ -16,8 +16,8 @@
 
 (defn format-clock [clock]
   (let [time-formatter (DateTimeFormatter/ofPattern "HH:mm")
-        start-time (LocalDateTime/parse (:starttime clock))
-        end-time (LocalDateTime/parse (:stoptime clock))
+        start-time (from-epoch (:starttime clock))
+        end-time (from-epoch (:stoptime clock))
         clock-duration (Duration/between start-time end-time)]
     (format "%s-%s (%s)"
             (.format start-time time-formatter)
