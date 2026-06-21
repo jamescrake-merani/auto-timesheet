@@ -89,13 +89,13 @@
   [clocks]
   (group-by
    (fn [clock]
-     (.toLocalDate (from-epoch (:starttime clock))))
-   clocks))
+     (.toLocalDate (:starttime clock)))
+   (map convert-clock clocks)))
 
 ;; Returns duration.
 (defn sum-clocks [clocks]
   (reduce #(.plus ^java.time.Duration %1
-                  (Duration/between (from-epoch (:starttime %2))
-                                    (from-epoch (:stoptime %2))))
-          Duration/ZERO clocks))
+                  (Duration/between (:starttime %2)
+                                    (:stoptime %2)))
+          Duration/ZERO (map convert-clock clocks)))
 
