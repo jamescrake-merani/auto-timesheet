@@ -62,7 +62,7 @@
    :category {:alias :c}})
 
 (defn report [{{:keys [type category]} :opts}]
-  (let [category-id (if category (as-db/get-category-from-name @db {:name category}))
+  (let [category-id (if category (:categoryid (as-db/get-category-from-name @db {:name category})))
         filter-function (if (nil? category-id)
                           (constantly true)
                           #(= (:categoryid %) category-id))
