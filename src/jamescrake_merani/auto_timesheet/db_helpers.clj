@@ -11,7 +11,7 @@
 (defn- to-epoch [^LocalDateTime ldt]
   (.toEpochSecond ldt ZoneOffset/UTC))
 
-(defn- from-epoch [epoch-seconds]
+(defn from-epoch [epoch-seconds]
   (LocalDateTime/ofInstant (Instant/ofEpochSecond epoch-seconds) ZoneOffset/UTC))
 
 (defn clock-in
@@ -60,9 +60,13 @@
 
 (defn delete-clocks [db period-start period-end]
   (as-db/delete-clockouts-within-timeperiod db {:periodstart (to-epoch period-start)
-                                                :periodend (to-epoch period-end)})
+                                                 :periodend (to-epoch period-end)})
   (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
                                                :periodend (to-epoch period-end)}))
+
+(defn clocks-within-timeperiod [db period-start period-end]
+  (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-start)
+                                      :periodend (to-epoch period-end)}))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
