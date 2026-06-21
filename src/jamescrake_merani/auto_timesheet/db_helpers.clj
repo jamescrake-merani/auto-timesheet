@@ -14,6 +14,13 @@
 (defn from-epoch [epoch-seconds]
   (LocalDateTime/ofInstant (Instant/ofEpochSecond epoch-seconds) ZoneOffset/UTC))
 
+(defn convert-clock [clock]
+  (into {}
+        (map (fn [[key value]]
+               (if (contains? #{:starttime :stoptime} key)
+                 [key (from-epoch value)]
+                 [key value])) clock)))
+
 (defn clock-in
   ([db category] (clock-in db category (LocalDateTime/now)))
   ([db category current-timestamp]
