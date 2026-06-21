@@ -97,7 +97,7 @@
   [clocks]
   (group-by
    (fn [clock]
-     (.toLocalDate (:starttime clock)))
+     (.toLocalDate ^LocalDateTime (:starttime clock)))
    clocks))
 
 ;; Returns duration.
