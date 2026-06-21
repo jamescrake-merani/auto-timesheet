@@ -3,20 +3,20 @@
 -- :result :raw
 create table if not exists clockin(
     clockinid    integer primary key autoincrement ,
-    starttime     datetime not null default (strftime('%Y-%m-%dT%H:%M:%S', 'now')),
+    starttime     integer not null,
     clockoutid  integer,
     categoryid integer not null,
     foreign key(clockoutid) references clockout(clockoutid),
     foreign key(categoryid) references category(categoryid) 
-);
+) strict;
 
 -- :name create-clock-out-table
 -- :command :execute
 -- :result :raw
 create table if not exists clockout(
     clockoutid     integer primary key autoincrement ,
-    stoptime      datetime not null default (strftime('%Y-%m-%dT%H:%M:%S', 'now'))
-);
+    stoptime      integer not null
+) strict;
 
 -- :name create-category-table
 -- :command :execute
@@ -24,7 +24,7 @@ create table if not exists clockout(
 create table if not exists category(
     categoryid  integer primary key autoincrement ,
     name        text not null
-);
+) strict;
 
 -- :name clock-in
 -- :command :execute

@@ -16,8 +16,8 @@
 
 (defn format-clock [clock]
   (let [time-formatter (DateTimeFormatter/ofPattern "HH:mm")
-        start-time (LocalDateTime/parse (:starttime clock))
-        end-time (LocalDateTime/parse (:stoptime clock))
+        ^LocalDateTime start-time (:starttime clock)
+        ^LocalDateTime end-time (:stoptime clock)
         clock-duration (Duration/between start-time end-time)]
     (format "%s-%s (%s)"
             (.format start-time time-formatter)

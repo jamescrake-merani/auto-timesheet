@@ -10,11 +10,11 @@
 
 (t/deftest clockin-clockout-test
   (let [db (db-init/open-database ":memory:")]
-    (t/is (= (count (db-raw/hanging-clockins db)) 0))
+    (t/is (= (count (sut/hanging-clockins db)) 0))
     (sut/clock-in db "test")
-    (t/is (= (count (db-raw/hanging-clockins db)) 1))
+    (t/is (= (count (sut/hanging-clockins db)) 1))
     (sut/clock-out db)
-    (t/is (= (count (db-raw/hanging-clockins db)) 0))))
+    (t/is (= (count (sut/hanging-clockins db)) 0))))
 
 (def duration-test-data
   [[(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 12 00) 120]
@@ -31,8 +31,8 @@
 (defn verify-duration [clock expected-minutes]
   (t/is
    (= (.toMinutes
-       (Duration/between (LocalDateTime/parse (:starttime clock))
-                         (LocalDateTime/parse (:stoptime clock))))
+       (Duration/between (:starttime clock)
+                         (:stoptime clock)))
       expected-minutes)))
 
 (t/deftest clockin-duration-test
@@ -41,9 +41,9 @@
       (sut/clock-in db "test" (first datum))
       (sut/clock-out db (second datum))
       (let [full-clock (first
-                        (db-raw/clocks-within-timeperiod
-                         db {:periodstart (LocalDateTime/of 2026 6 11 0 0)
-                             :periodend (LocalDateTime/of 2026 6 11 23 59)}))]
+                        (sut/clocks-within-timeperiod
+                         db (LocalDateTime/of 2026 6 11 0 0)
+                            (LocalDateTime/of 2026 6 11 23 59)))]
         (verify-duration full-clock (nth datum 2))))))
 
 (t/deftest manual-clock-duration-test
@@ -51,9 +51,9 @@
     (let [db (db-init/open-database ":memory:")]
       (db-raw/create-category db {:name "test"})
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
-      (let [full-clock (first (db-raw/clocks-within-timeperiod
-                               db {:periodstart (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
-                                   :periodend (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))}))]
+      (let [full-clock (first (sut/clocks-within-timeperiod
+                               db (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
+                                  (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
         (verify-duration full-clock (nth datum 2))))))
 
 (def deletion-clock-test-data
@@ -109,7 +109,7 @@
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
-      (t/is (= (count (db-raw/all-clocks db)) (:expected-remaining-clocks datum)))
-      (t/is (= (count (db-raw/clocks-within-timeperiod db {:periodstart (first (:period datum))
-                                                           :periodend (second (:period datum))}))
+      (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
+      (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
+                                                       (second (:period datum))))
                0)))))

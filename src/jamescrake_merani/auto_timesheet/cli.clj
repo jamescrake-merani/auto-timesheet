@@ -25,9 +25,9 @@
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [{{:keys [category]} :opts}]
-  (let [hanging-clockins (as-db/hanging-clockins @db)
+  (let [hanging-clockins (helpers/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
-                             (-> (as-db/hanging-clockins @db) first :starttime LocalDateTime/parse))]
+                             (:starttime (first hanging-clockins)))]
     (cond (empty? hanging-clockins)
           (do
             (.println ^java.io.PrintWriter *err* "You are not clocked in.")
@@ -48,7 +48,7 @@
 (defn clockin [{{:keys [category force]} :opts}]
   (let [category-to-use (or category (:default-category @config))]
     (cond
-      (not (or (empty? (as-db/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
+      (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
       ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
       (nil? category-to-use) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins as you haven't provided a default one in your config.")
                                  (System/exit 1))
@@ -76,11 +76,11 @@
   (format "%s %s. %s elapsed since clockin."
           (if one-clockin? "You are currently clocked into" "You are clocked into")
           (:name (as-db/get-category-name-from-id @db {:id (:categoryid clockin)}))
-          (format-duration (Duration/between (LocalDateTime/parse (:starttime clockin))
+          (format-duration (Duration/between (:starttime clockin)
                                              (LocalDateTime/now)))))
 
 (defn print-status []
-  (let [hanging-clockins (as-db/hanging-clockins @db)]
+  (let [hanging-clockins (helpers/hanging-clockins @db)]
     (cond (empty? hanging-clockins) (println "You are not currently clocked in.")
           (= (count hanging-clockins) 1) (println (format-clockin (first hanging-clockins) true))
           :else (do
@@ -97,8 +97,8 @@
                     (format "%s - %s %s"
                             (:starttime clock)
                             (:stoptime clock)
-                            (format-duration (Duration/between (LocalDateTime/parse (:starttime clock))
-                                                               (LocalDateTime/parse (:stoptime clock))))))
+                            (format-duration (Duration/between (:starttime clock)
+                                                               (:stoptime clock)))))
                   clocks))))
 
 (def range-spec
@@ -114,10 +114,10 @@
         period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
         period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
         to-remove
-        (as-db/clocks-within-timeperiod
+        (helpers/clocks-within-timeperiod
          @db
-         {:periodstart period-start
-          :periodend period-end})]
+         period-start
+         period-end)]
     (if (empty? to-remove)
       (do
         (.println ^java.io.PrintWriter *err* "No clocks were found in the period you specified.")
