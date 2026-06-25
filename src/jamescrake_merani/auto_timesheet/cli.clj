@@ -18,7 +18,8 @@
 (def db (delay (open-database (:sql-directory @config))))
 
 (def clock-spec
-  {:category {:alias :c}
+  {:category {:alias :c
+              :desc "The category to clock into. This only needs to be specified if you don't have a default category in your config."}
    :force {:alias :f
            :coerce :boolean
            :desc "Create a clock in even if there already is one."}})
@@ -58,8 +59,10 @@
 
 (def report-spec
   {:type {:alias :t
-          :require true}
-   :category {:alias :c}})
+          :require true
+          :spec "The type of report to generate."}
+   :category {:alias :c
+              :spec "Only show clocks from this specific category."}})
 
 (defn report [{{:keys [type category]} :opts}]
   (let [category-id (if category (:categoryid (as-db/get-category-from-name @db {:name category})))
@@ -108,10 +111,13 @@
 
 (def range-spec
   {:start-time {:alias :s
-                :require true}
+                :require true
+                :desc "The start time of this range."}
    :end-time {:alias :e
-              :require true}
-   :date {:alias :d}})
+              :require true
+              :desc "The end time of this range."}
+   :date {:alias :d
+          :desc "The date of both the start, and end time."}})
 
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command [{{:keys [start-time end-time date]} :opts}]
@@ -145,7 +151,8 @@
 
 (def manual-entry-spec
   (assoc range-spec :category {:alias :c
-                               :require true}))
+                               :require true
+                               :desc "The category of this manual entry."}))
 
 (defn manual-entry [{{:keys [start-time end-time date category]} :opts}]
   (let [start-local-time (LocalTime/parse start-time)
