@@ -1,4 +1,4 @@
-site_name: Auto Timesheet Documentation
+site_name: Auto Timesheet Manual
 nav:
   - Home: index.md
 theme: readthedocs
