@@ -65,3 +65,18 @@ Note that you should entry times in 24 hour format. If you need to make a manual
 ```
 
 The date parameter needs to be in ISO-8601 format, as parsed in by Java. See the [Java documentation](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_LOCAL_DATE) for an exact description of how this string is parsed in.
+
+## Reports
+
+After making using the clocking functionality, you'll probably want to see a summary of the amount of time you've spent working. At present, only one report type is implemented: human readable.
+
+```
+> auto-timesheet report -t human-readable
+Thursday:
+11:00-13:00 (2 hours, 0 minutes)
+Friday:
+09:00-12:00 (3 hours, 0 minutes)
+Total work completed: 5 hours, 0 minutes
+```
+
+You can also filter based on the category using the `--category` flag if you wish to (see `auto-timesheet report --help` for more details.)
