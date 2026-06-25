@@ -1,4 +1,5 @@
 site_name: Auto Timesheet Manual
 nav:
   - Home: index.md
+  - Concepts: concepts.md
 theme: readthedocs
