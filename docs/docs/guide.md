@@ -15,6 +15,17 @@ Run 'auto-timesheet --help' for a list of all commands.
 
 As we've just started, we of course haven't clocked in yet. Lets do so.
 
+The first time you run the clockin command without any arguemnts, you'll get this error:
+
+```
+> auto-timesheet clockin
+You need to provide a category with clock ins as you haven't provided a default one in your config.
+```
+
+If most of your clocks are relevant to just one category (e.g. work), you are probably better off adding that category to your configuration (see configuration). LINK.
+
+For me, most of the clocks I'll make are for work, so I'll make thay my default category, and rerun the command.
+
 ```
 > auto-timesheet clockin
 Clocked in.
