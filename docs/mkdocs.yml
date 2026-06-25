@@ -3,4 +3,6 @@ nav:
   - Home: index.md
   - Concepts: concepts.md
   - CLI Guide: guide.md
+plugins:
+  - autorefs
 theme: readthedocs
