@@ -8,7 +8,6 @@ If you are looking for a reference for all the CLI flags, you'll probably find t
 
 If you are new, you should firstly start by reading the concepts page, and then proceed to the [CLI tutorial](guide.md).
 
-
 ## Other interesting links.
 
 If you are interested in a technical discussion regarding the choices I made on this project, then I will be writing a blog article on this soon.
