@@ -15,7 +15,7 @@ Run 'auto-timesheet --help' for a list of all commands.
 
 As we've just started, we of course haven't clocked in yet. Lets do so.
 
-The first time you run the clockin command without any arguemnts, you'll get this error:
+The first time you run the clockin command without any arguments, you'll get this error:
 
 ```txt
 > auto-timesheet clockin
