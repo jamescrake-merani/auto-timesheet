@@ -163,13 +163,13 @@
       (helpers/manual-entry @db start-local-time end-local-time category))))
 
 (def table
-  [{:cmds ["clockin"] :fn clockin :doc "Clock in" :spec clock-spec}
-   {:cmds ["clockout"] :fn clockout :doc "Clock out" :spec clock-spec}
+  [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
+   {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
-   {:cmds [] :fn no-command :doc "No command"}])
+   {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
 (defn -main [& args]
