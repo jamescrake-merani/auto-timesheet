@@ -51,14 +51,14 @@ Note that you cannot have breaks during clockins. If you want to take a break, t
 
 ## Manual Entries
 
-The previous commands make entries baded on what the current time is. Thats useful if we want to clock in, and clock out at the same time we start, and stop working. But if you work for a period, and want to make a clock _after_, you'll need to make a manual entry:
+The previous commands make entries based on what the current time is. That is useful if we want to clock in, and clock out at the same time we start, and stop working. But if you work for a period, and want to make a clock _afterwards_, you'll need to make a manual entry:
 
 ```txt
 > auto-timesheet manual-entry --start-time 11:00 --end-time 13:00 --category work
 
 ```
 
-Note that you should entry times in 24 hour format. If you need to make a manual entry that is on a different day, you'll need to specify the date parameter.
+Note that you should write entry times in 24 hour format. If you need to make a manual entry that is on a different day, you'll need to specify the date parameter.
 
 ```txt
 > auto-timesheet manual-entry --start-time 11:00 --end-time 13:00 --date 2026-06-25 --category work
@@ -68,7 +68,7 @@ The date parameter needs to be in ISO-8601 format, as parsed in by Java. See the
 
 ## Reports
 
-After making using the clocking functionality, you'll probably want to see a summary of the amount of time you've spent working. At present, only one report type is implemented: human readable.
+After using the clocking functionality, you'll probably want to see a summary of the amount of time you've spent working. At present, only one report type is implemented: human readable.
 
 ```txt
 > auto-timesheet report -t human-readable
