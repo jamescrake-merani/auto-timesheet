@@ -165,7 +165,7 @@
 
 (defn directories [_]
   (println
-   (format "Your config is stored in ~s" (.dataDir ^ProjectDirectories directories)))
+   (format "Your config is stored in ~s" (.dataDir ^ProjectDirectories @directories)))
   (println
    (format "The database is stored in ~s" (:sql-directory config))))
 
