@@ -1,0 +1,82 @@
+# Guide to the CLI.
+
+## Status
+
+When you first run auto-timesheet without any arguments, it will give you the current status.
+
+```txt
+> auto-timesheet
+You are not currently clocked in.
+Run 'auto-timesheet --help' for a list of all commands.
+```
+
+
+## Clocking in, and out.
+
+As we've just started, we of course haven't clocked in yet. Lets do so.
+
+The first time you run the clockin command without any arguments, you'll get this error:
+
+```txt
+> auto-timesheet clockin
+You need to provide a category with clock ins as you haven't provided a default one in your config.
+```
+
+If most of your clocks are relevant to just one category (e.g. work), you are probably better off adding that category to your configuration (see [Configuration](configuration.md)).
+
+For me, most of the clocks I'll make are for work, so I'll make that my default category, and rerun the command.
+
+```txt
+> auto-timesheet clockin
+Clocked in.
+```
+
+Now if we get the status again, we should see that we are clocked in.
+
+```txt
+> auto-timesheet status
+You are currently clocked into work. 0 hours, 0 minutes elapsed since clockin.
+```
+
+Note that we added 'status'. This is the same as not providing a subcommand, but this time we don't get prompted to run the help command.
+
+Once we're finished working, we can clock out:
+
+```txt
+> auto-timesheet clockout
+Clocked out. You have worked 0 hours, 30 minutes
+```
+
+Note that you cannot have breaks during clockins. If you want to take a break, the easiest thing to do is clock out, then clock back in once you're done.
+
+## Manual Entries
+
+The previous commands make entries based on what the current time is. That is useful if we want to clock in, and clock out at the same time we start, and stop working. But if you work for a period, and want to make a clock _afterwards_, you'll need to make a manual entry:
+
+```txt
+> auto-timesheet manual-entry --start-time 11:00 --end-time 13:00 --category work
+
+```
+
+Note that you should write entry times in 24 hour format. If you need to make a manual entry that is on a different day, you'll need to specify the date parameter.
+
+```txt
+> auto-timesheet manual-entry --start-time 11:00 --end-time 13:00 --date 2026-06-25 --category work
+```
+
+The date parameter needs to be in ISO-8601 format, as parsed in by Java. See the [Java documentation](https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html#ISO_LOCAL_DATE) for an exact description of how this string is parsed in.
+
+## Reports
+
+After using the clocking functionality, you'll probably want to see a summary of the amount of time you've spent working. At present, only one report type is implemented: human readable.
+
+```txt
+> auto-timesheet report -t human-readable
+Thursday:
+11:00-13:00 (2 hours, 0 minutes)
+Friday:
+09:00-12:00 (3 hours, 0 minutes)
+Total work completed: 5 hours, 0 minutes
+```
+
+You can also filter based on the category using the `--category` flag if you wish to (see `auto-timesheet report --help` for more details.)
