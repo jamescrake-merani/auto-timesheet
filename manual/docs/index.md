@@ -2,7 +2,7 @@
 
 This is the user manual for Auto Timesheet. Its main objective is to teach you how to use the program on the command line.
 
-If you are looking for a reference for all the CLI flags, you'll probably find the manpage much more concise. If you're on a Unix-like system, you should be able to type `man auto-timesheet`.
+If you are looking for a reference of all the CLI flags, you can use the `auto-timesheet --help` command.
 
 ## Where to start
 
