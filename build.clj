@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [test])
   (:require [clojure.tools.build.api :as b]))
 
-(def lib 'net.clojars.jamescrake-merani/auto-timesheet)
+(def lib 'com.github.jamescrake-merani/auto-timesheet)
 (def version "0.1.0")
 (def main 'jamescrake-merani.auto-timesheet.cli)
 (def class-dir "target/classes")
