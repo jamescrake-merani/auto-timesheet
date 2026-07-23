@@ -22,7 +22,7 @@
               :desc "The category to clock into. This only needs to be specified if you don't have a default category in your config."}
    :force {:alias :f
            :coerce :boolean
-           :desc "Create a clock in even if there already is one."}})
+           :desc "Create a clock in even if you are already clocked in."}})
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [{{:keys [category]} :opts}]
