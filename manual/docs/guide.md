@@ -24,7 +24,7 @@ You need to provide a category with clock ins as you haven't provided a default 
 
 If most of your clocks are relevant to just one category (e.g. work), you are probably better off adding that category to your configuration (see [Configuration](configuration.md)).
 
-For me, most of the clocks I'll make are for work, so I'll make thay my default category, and rerun the command.
+For me, most of the clocks I'll make are for work, so I'll make that my default category, and rerun the command.
 
 ```txt
 > auto-timesheet clockin
