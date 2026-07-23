@@ -5,15 +5,16 @@
             [clojure.java.io :as io]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
             [jamescrake-merani.auto-timesheet.reports :refer [reports-available format-duration]]
-            [jamescrake-merani.auto-timesheet.config :refer [load-config]]
+            [jamescrake-merani.auto-timesheet.config :as configuration]
             [clojure.string :as str])
   (:import (java.time Duration
                       LocalDateTime
                       LocalDate
-                      LocalTime))
+                      LocalTime)
+           (dev.dirs ProjectDirectories))
   (:gen-class))
 
-(def config (delay (load-config)))
+(def config (delay (configuration/load-config)))
 ;; TODO: I'm not sure whether this should be at this level.
 (def db (delay (open-database (:sql-directory @config))))
 
@@ -162,6 +163,12 @@
       (helpers/manual-entry @db (LocalDateTime/of local-date start-local-time) (LocalDateTime/of local-date end-local-time) category)
       (helpers/manual-entry @db start-local-time end-local-time category))))
 
+(defn directories [_]
+  (println
+   (format "Your config is stored in %s" (.dataDir ^ProjectDirectories @configuration/directories)))
+  (println
+   (format "The database is stored in %s" (:sql-directory @config))))
+
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
@@ -169,6 +176,7 @@
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
+   {:cmds ["directories"] :fn directories :doc "Show the directories of where the config, and database is stored."}
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
