@@ -167,7 +167,7 @@
   (println
    (format "Your config is stored in %s" (.dataDir ^ProjectDirectories @configuration/directories)))
   (println
-   (format "The database is stored in %s" (:sql-directory config))))
+   (format "The database is stored in %s" (:sql-directory @config))))
 
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
