@@ -6,7 +6,7 @@ If you are looking for a reference of all the CLI flags, you can use the `auto-t
 
 ## Where to start
 
-If you are new, you should firstly start by reading the concepts page, and then proceed to the [CLI tutorial](guide.md).
+If you are new, you should firstly start by reading the [Concepts](concepts.md) page, and then proceed to the [CLI tutorial](guide.md).
 
 ## Other interesting links.
 
