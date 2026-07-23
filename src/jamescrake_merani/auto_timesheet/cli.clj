@@ -5,7 +5,7 @@
             [clojure.java.io :as io]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
             [jamescrake-merani.auto-timesheet.reports :refer [reports-available format-duration]]
-            [jamescrake-merani.auto-timesheet.config :refer [load-config directories]]
+            [jamescrake-merani.auto-timesheet.config :as configuration]
             [clojure.string :as str])
   (:import (java.time Duration
                       LocalDateTime
@@ -14,7 +14,7 @@
            (dev.dirs ProjectDirectories))
   (:gen-class))
 
-(def config (delay (load-config)))
+(def config (delay (configuration/load-config)))
 ;; TODO: I'm not sure whether this should be at this level.
 (def db (delay (open-database (:sql-directory @config))))
 
@@ -165,7 +165,7 @@
 
 (defn directories [_]
   (println
-   (format "Your config is stored in ~s" (.dataDir ^ProjectDirectories @directories)))
+   (format "Your config is stored in ~s" (.dataDir ^ProjectDirectories @configuration/directories)))
   (println
    (format "The database is stored in ~s" (:sql-directory config))))
 
