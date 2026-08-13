@@ -46,7 +46,7 @@
 (defn- get-effective-datetime [time-from-user]
   (if time-from-user
     (LocalDateTime/of (LocalDate/now) (LocalTime/parse time-from-user))
-    (LocalTime/now)))
+    (LocalDateTime/now)))
 
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout [{{:keys [category time]} :opts}]
