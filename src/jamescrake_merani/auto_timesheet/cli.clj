@@ -162,9 +162,17 @@
 (defn status-command [_]
   (print-status))
 
-(defn no-command [_]
-  (print-status)
-  (println "Run 'auto-timesheet --help' for a list of all commands."))
+(defn no-command [opts]
+  ;; If args is nil, no subcommand was provided so we can assume the user wants
+  ;; the status. Otherwise, we assume the user entered a subcommand that does
+  ;; not exist, and thus we give them a warning.
+  (if (nil? (:args opts))
+    (do
+      (print-status)
+      (println "Run 'auto-timesheet --help' for a list of all commands."))
+    (do
+      (.println ^java.io.PrintWriter *err* "The command you provided does not exist. Run 'auto-timesheet --help' for a list of all commands.")
+      (System/exit 1))))
 
 (def manual-entry-spec
   (assoc range-spec :category {:alias :c
