@@ -39,39 +39,48 @@
               :desc "The category to clock into. This only needs to be specified if you don't have a default category in your config."}
    :force {:alias :f
            :coerce :boolean
-           :desc "Create a clock in even if you are already clocked in."}})
+           :desc "Create a clock in even if you are already clocked in."}
+   :time {:alias :t
+          :desc "The effective time of the clock. If not specified, then this will be the current time according to your system."}})
+
+(defn- get-effective-datetime [time-from-user]
+  (if time-from-user
+    (LocalDateTime/of (LocalDate/now) (LocalTime/parse time-from-user))
+    (LocalDateTime/now)))
 
 ;: TODO: Probably want to be able to provide a category.
-(defn clockout [{{:keys [category]} :opts}]
+(defn clockout [{{:keys [category time]} :opts}]
   (let [hanging-clockins (helpers/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
-                             (:starttime (first hanging-clockins)))]
+                             (:starttime (first hanging-clockins)))
+        effective-datetime (get-effective-datetime time)]
     (cond (empty? hanging-clockins)
           (do
             (.println ^java.io.PrintWriter *err* "You are not clocked in.")
             (System/exit 1))
           (= (count hanging-clockins) 1)
-          (helpers/clock-out @db)
+          (helpers/clock-out @db effective-datetime)
           (nil? category)
           (do
             (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
             (System/exit 1))
           :else (let [category-id (as-db/get-category-from-name @db {:name category})]
-                  (helpers/clock-out @db category-id)))
+                  (helpers/clock-out @db category-id effective-datetime)))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
-(defn clockin [{{:keys [category force]} :opts}]
-  (let [category-to-use (or category (:default-category @config))]
+(defn clockin [{{:keys [category force time]} :opts}]
+  (let [category-to-use (or category (:default-category @config))
+        effective-datetime (get-effective-datetime time)]
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
       ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
       (nil? category-to-use) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins as you haven't provided a default one in your config.")
                                  (System/exit 1))
       :else (do
-              (helpers/clock-in @db category-to-use)
+              (helpers/clock-in @db category-to-use effective-datetime)
               (println "Clocked in.")))))
 
 (def report-spec
