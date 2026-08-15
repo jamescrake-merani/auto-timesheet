@@ -107,7 +107,7 @@
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
 (defn print-reports-available [_]
-  (println "The following reports types are implemented:")
+  (println "The following report types are implemented:")
   (doseq [report (keys reports-available)]
     (println "-" (name report))))
 
