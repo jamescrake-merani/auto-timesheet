@@ -43,7 +43,7 @@
       (let [full-clock (first
                         (sut/clocks-within-timeperiod
                          db (LocalDateTime/of 2026 6 11 0 0)
-                            (LocalDateTime/of 2026 6 11 23 59)))]
+                         (LocalDateTime/of 2026 6 11 23 59)))]
         (verify-duration full-clock (nth datum 2))))))
 
 (t/deftest manual-clock-duration-test
@@ -53,7 +53,7 @@
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       (let [full-clock (first (sut/clocks-within-timeperiod
                                db (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
-                                  (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
+                               (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
         (verify-duration full-clock (nth datum 2))))))
 
 (def deletion-clock-test-data
