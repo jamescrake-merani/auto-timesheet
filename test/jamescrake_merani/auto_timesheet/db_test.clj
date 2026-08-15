@@ -116,9 +116,22 @@
 
 (def within-day-clock-test-data
   [{:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
-             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]
-             [(LocalDateTime/of 2026 6 12 9 00) (LocalDateTime/of 2026 6 12 12 00)]]
-    :expected-duration (Duration/ofHours 7)}])
+              [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]
+              [(LocalDateTime/of 2026 6 12 9 00) (LocalDateTime/of 2026 6 12 12 00)]]
+     :expected-duration (Duration/ofHours 7)}
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
+              [(LocalDateTime/of 2026 6 11 10 30) (LocalDateTime/of 2026 6 11 12 30)]
+              [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 16 00)]]
+     :expected-duration (Duration/ofHours 6)}
+   {:clocks [[(LocalDateTime/of 2026 6 10 9 00) (LocalDateTime/of 2026 6 10 12 00)]
+              [(LocalDateTime/of 2026 6 12 13 00) (LocalDateTime/of 2026 6 12 17 00)]
+              [(LocalDateTime/of 2026 6 13 8 00) (LocalDateTime/of 2026 6 13 10 00)]]
+     :expected-duration (Duration/ofHours 0)}
+   {:clocks [[(LocalDateTime/of 2026 6 11 7 00) (LocalDateTime/of 2026 6 11 9 00)]
+              [(LocalDateTime/of 2026 6 9 10 00) (LocalDateTime/of 2026 6 9 13 00)]
+              [(LocalDateTime/of 2026 6 11 18 00) (LocalDateTime/of 2026 6 11 20 00)]
+              [(LocalDateTime/of 2026 6 14 8 00) (LocalDateTime/of 2026 6 14 12 00)]]
+     :expected-duration (Duration/ofHours 4)}])
 
 (t/deftest within-day-clocks
   (doseq [datum within-day-clock-test-data]
