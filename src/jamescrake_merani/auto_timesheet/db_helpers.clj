@@ -96,9 +96,9 @@
                                            :periodend (to-epoch period-end)})))
 
 (defn clocks-within-date [db ^LocalDate date]
-  (clocks-within-timeperiod db (LocalDateTime/of date
-                                                 (LocalTime/of 0 0)
-                                                 (LocalTime/of 23 59))))
+  (clocks-within-timeperiod db
+                            (LocalDateTime/of date (LocalTime/of 0 0))
+                            (LocalDateTime/of date (LocalTime/of 23 59))))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
