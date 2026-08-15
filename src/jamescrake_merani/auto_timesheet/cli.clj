@@ -85,7 +85,6 @@
 
 (def report-spec
   {:type {:alias :t
-          :require true
           :spec "The type of report to generate."}
    :category {:alias :c
               :spec "Only show clocks from this specific category."}})
@@ -95,7 +94,8 @@
         filter-function (if (nil? category-id)
                           (constantly true)
                           #(= (:categoryid %) category-id))
-        report-function (get reports-available (keyword type))]
+        report-type (or (keyword type) (keyword (:default-report @config)))
+        report-function (get reports-available report-type)]
     (if (and category (nil? category-id))
       (do
         (.println ^java.io.PrintWriter *err* "That category does not exist.")
@@ -105,6 +105,11 @@
         (.println ^java.io.PrintWriter *err* "That report type does not exist.")
         (System/exit 1))
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
+
+(defn print-reports-available [_]
+  (println "The following report types are implemented:")
+  (doseq [report (keys reports-available)]
+    (println "-" (name report))))
 
 (defn format-clockin [clockin one-clockin?]
   (format "%s %s. %s elapsed since clockin."
@@ -212,6 +217,7 @@
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
+   {:cmds ["reports-available"] :fn print-reports-available :doc "Shows all the reports that are available in this build."}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
