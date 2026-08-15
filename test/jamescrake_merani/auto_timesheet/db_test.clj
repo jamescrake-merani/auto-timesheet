@@ -111,5 +111,19 @@
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
       (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
       (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
-                                                       (second (:period datum))))
+                                                    (second (:period datum))))
                0)))))
+
+(def within-day-clock-test-data
+  [{:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]
+             [(LocalDateTime/of 2026 6 12 9 00) (LocalDateTime/of 2026 6 12 12 00)]]
+    :expected-duration (Duration/ofHours 7)}])
+
+(t/deftest within-day-clocks
+  (doseq [datum within-day-clock-test-data]
+    (let [db (db-init/open-database ":memory:")]
+      (db-raw/create-category db {:name "test"})
+      (doseq [[clock-start clock-end] (:clocks datum)]
+        (sut/manual-entry db clock-start clock-end "test"))
+      (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
