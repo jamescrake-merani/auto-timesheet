@@ -85,7 +85,6 @@
 
 (def report-spec
   {:type {:alias :t
-          :require true
           :spec "The type of report to generate."}
    :category {:alias :c
               :spec "Only show clocks from this specific category."}})
