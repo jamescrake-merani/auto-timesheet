@@ -27,7 +27,7 @@
 
 (defn format-duration [^java.time.Duration d]
   (format "%d hours, %d minutes"
-          (.toHoursPart d)
+          (.toHours d)
           (.toMinutesPart d)))
 
 (defn format-clock [clock]
