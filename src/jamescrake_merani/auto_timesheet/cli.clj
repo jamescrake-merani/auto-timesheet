@@ -95,7 +95,8 @@
         filter-function (if (nil? category-id)
                           (constantly true)
                           #(= (:categoryid %) category-id))
-        report-function (get reports-available (keyword type))]
+        report-type (or (keyword type) (keyword (:default-report @config)))
+        report-function (get reports-available report-type)]
     (if (and category (nil? category-id))
       (do
         (.println ^java.io.PrintWriter *err* "That category does not exist.")
