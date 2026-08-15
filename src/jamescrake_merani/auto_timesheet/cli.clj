@@ -105,6 +105,12 @@
                                              (LocalDateTime/now)))))
 
 (defn print-status []
+  (println
+   (format "You have clocked in %s today."
+           (-> @db
+               (helpers/clocks-within-date (LocalDate/now))
+               helpers/sum-clocks
+               format-duration)))
   (let [hanging-clockins (helpers/hanging-clockins @db)]
     (cond (empty? hanging-clockins) (println "You are not currently clocked in.")
           (= (count hanging-clockins) 1) (println (format-clockin (first hanging-clockins) true))
