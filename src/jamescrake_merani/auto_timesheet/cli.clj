@@ -106,7 +106,7 @@
         (System/exit 1))
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
-(defn report-types [_]
+(defn print-reports-available [_]
   (println "The following reports types are implemented")
   (doseq [report reports-available]
     (println-str "-" (name report))))
@@ -217,7 +217,7 @@
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
-   {:cmds ["reports-available" :fn reports-available :doc "Shows all the reports that are available in this build."]}
+   {:cmds ["reports-available" :fn print-reports-available :doc "Shows all the reports that are available in this build."]}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
