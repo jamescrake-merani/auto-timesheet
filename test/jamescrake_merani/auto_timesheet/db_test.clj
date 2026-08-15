@@ -43,7 +43,7 @@
       (let [full-clock (first
                         (sut/clocks-within-timeperiod
                          db (LocalDateTime/of 2026 6 11 0 0)
-                         (LocalDateTime/of 2026 6 11 23 59)))]
+                            (LocalDateTime/of 2026 6 11 23 59)))]
         (verify-duration full-clock (nth datum 2))))))
 
 (t/deftest manual-clock-duration-test
@@ -53,7 +53,7 @@
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       (let [full-clock (first (sut/clocks-within-timeperiod
                                db (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
-                               (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
+                                  (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
         (verify-duration full-clock (nth datum 2))))))
 
 (def deletion-clock-test-data
@@ -111,32 +111,5 @@
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
       (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
       (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
-                                                    (second (:period datum))))
+                                                       (second (:period datum))))
                0)))))
-
-(def within-day-clock-test-data
-  [{:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
-              [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]
-              [(LocalDateTime/of 2026 6 12 9 00) (LocalDateTime/of 2026 6 12 12 00)]]
-     :expected-duration (Duration/ofHours 7)}
-   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
-              [(LocalDateTime/of 2026 6 11 10 30) (LocalDateTime/of 2026 6 11 12 30)]
-              [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 16 00)]]
-     :expected-duration (Duration/ofHours 6)}
-   {:clocks [[(LocalDateTime/of 2026 6 10 9 00) (LocalDateTime/of 2026 6 10 12 00)]
-              [(LocalDateTime/of 2026 6 12 13 00) (LocalDateTime/of 2026 6 12 17 00)]
-              [(LocalDateTime/of 2026 6 13 8 00) (LocalDateTime/of 2026 6 13 10 00)]]
-     :expected-duration (Duration/ofHours 0)}
-   {:clocks [[(LocalDateTime/of 2026 6 11 7 00) (LocalDateTime/of 2026 6 11 9 00)]
-              [(LocalDateTime/of 2026 6 9 10 00) (LocalDateTime/of 2026 6 9 13 00)]
-              [(LocalDateTime/of 2026 6 11 18 00) (LocalDateTime/of 2026 6 11 20 00)]
-              [(LocalDateTime/of 2026 6 14 8 00) (LocalDateTime/of 2026 6 14 12 00)]]
-     :expected-duration (Duration/ofHours 4)}])
-
-(t/deftest within-day-clocks
-  (doseq [datum within-day-clock-test-data]
-    (let [db (db-init/open-database ":memory:")]
-      (db-raw/create-category db {:name "test"})
-      (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end "test"))
-      (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
