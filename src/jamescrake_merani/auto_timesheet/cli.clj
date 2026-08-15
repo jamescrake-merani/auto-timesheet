@@ -108,8 +108,8 @@
 
 (defn print-reports-available [_]
   (println "The following reports types are implemented")
-  (doseq [report reports-available]
-    (println-str "-" (name report))))
+  (doseq [report (keys reports-available)]
+    (println "-" (name report))))
 
 (defn format-clockin [clockin one-clockin?]
   (format "%s %s. %s elapsed since clockin."
