@@ -143,11 +143,6 @@
       (as-db/amend-clockout db {:newstoptime (.toEpochSecond newtime)
                                 :oldstoptime (.toEpochSecond oldtime)}))))
 
-;; For these two functions: clock should be converted with `convert-clock`
-(defn amend-clockin [db clock ^LocalDateTime new-start-date]
-  (as-db/amend-clockin db {:newstarttime (.toEpochSecond new-start-date)
-                           :oldstarttime (.toEpochSecond ^LocalDateTime (:starttime clock))}))
-
 ;; Returns duration.
 (defn sum-clocks [clocks]
   (reduce #(.plus ^java.time.Duration %1
