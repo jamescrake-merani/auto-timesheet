@@ -82,7 +82,7 @@ where clockinid = :clockinid;
 select *
 from clockin as i
 join clockout as o on i.clockoutid = o.clockoutid 
-where i.starttime >= :periodstart and i.starttime <= :periodend
+where i.:i:timeparam >= :periodstart and i.:i:timeparam <= :periodend
 
 -- :name all-clocks
 -- :command :execute
