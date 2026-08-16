@@ -113,9 +113,7 @@
                                              (.with DayOfWeek/MONDAY)
                                              (.with LocalTime/MIDNIGHT))
          period-end (.plusWeeks period-beginning 1)]
-     (map convert-clock
-          (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-beginning)
-                                              :periodend (to-epoch period-end)})))))
+     (clocks-within-timeperiod db period-beginning period-end))))
 
 (defn all-clocks [db]
   (map convert-clock (as-db/all-clocks db)))
