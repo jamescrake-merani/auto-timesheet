@@ -125,10 +125,23 @@
      (.toLocalDate ^LocalDateTime (:starttime clock)))
    clocks))
 
-(defn get-clock-at-time [db ^LocalDateTime datetime]
-  (clocks-within-timeperiod db
-                            (.truncatedTo datetime ChronoUnit/MINUTES)
-                            (-> datetime (.withSecond 59) (.withNano 999999999))))
+(defn get-clock-at-time [db ^LocalDateTime datetime in-or-out?]
+  ;; TODO: Assumes there will only be one clock at that time. This could fail if
+  ;; this assumption is not true.
+  (first
+   (clocks-within-timeperiod
+    db
+    (.truncatedTo datetime ChronoUnit/MINUTES)
+    (-> datetime (.withSecond 59) (.withNano 999999999))
+    in-or-out?)))
+
+(defn amend-clock [db in-or-out? ^LocalDateTime oldtime ^LocalDateTime newtime]
+  (let [to-amend (get-clock-at-time db time in-or-out?)]
+    (if in-or-out?
+      (as-db/amend-clockin db {:newstarttime (.toEpochSecond newtime)
+                               :oldstarttime (.toEpochSecond oldtime)})
+      (as-db/amend-clockout db {:newstoptime (.toEpochSecond newtime)
+                                :oldstoptime (.toEpochSecond oldtime)}))))
 
 ;; For these two functions: clock should be converted with `convert-clock`
 (defn amend-clockin [db clock ^LocalDateTime new-start-date]
