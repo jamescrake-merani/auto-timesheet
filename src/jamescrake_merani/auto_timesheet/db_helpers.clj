@@ -99,7 +99,7 @@
          db
          {:periodstart (to-epoch period-start)
           :periodend (to-epoch period-end)
-          :timeparam (if use-starttime? :starttime :stoptime)}))))
+          :timeparam (if use-starttime? "starttime" "stoptime")}))))
 
 (defn clocks-within-date [db ^LocalDate date]
   (clocks-within-timeperiod db
