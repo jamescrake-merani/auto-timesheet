@@ -90,11 +90,16 @@
                                                 :periodend (to-epoch period-end)})
   (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
                                                :periodend (to-epoch period-end)}))
-
-(defn clocks-within-timeperiod [db period-start period-end]
-  (map convert-clock
-       (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-start)
-                                           :periodend (to-epoch period-end)})))
+(defn clocks-within-timeperiod
+  ([db period-start period-end]
+   (clocks-within-timeperiod db period-start period-end true))
+  ([db period-start period-end use-starttime?]
+   (map convert-clock
+        (as-db/clocks-within-timeperiod
+         db
+         {:periodstart (to-epoch period-start)
+          :periodend (to-epoch period-end)
+          :timeparam (if use-starttime? :starttime :stoptime)}))))
 
 (defn clocks-within-date [db ^LocalDate date]
   (clocks-within-timeperiod db
