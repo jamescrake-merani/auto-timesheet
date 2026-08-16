@@ -107,6 +107,21 @@ where clockoutid in (
 delete from clockin
 where starttime >= :periodstart and starttime <= :periodend;
 
+-- :name amend-clockin
+-- :command :execute
+-- :result :raw
+update clockin
+set starttime = :newstarttime
+where starttime = :originalstarttime
+
+-- :name amend-clockout
+-- :command :execute
+-- :result :raw
+update clockout
+set stoptime = :newstoptime
+where stoptime = :originalstoptime
+
+
 -- :name get-category-from-name
 -- :command :execute
 -- :result :one
