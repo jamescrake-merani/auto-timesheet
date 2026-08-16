@@ -140,3 +140,11 @@
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
       (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
+
+;; Plan for amendments test
+;;
+;; Test data includes:
+;; - The clocks in the db.
+;; - The amendments to make
+;; - The new db, which should include the amended db.
+;; - Test gets all of the clocks, and make sure they match the second list.
