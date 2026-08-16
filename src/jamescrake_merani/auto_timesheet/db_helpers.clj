@@ -22,7 +22,8 @@
                       DayOfWeek
                       Duration
                       Instant
-                      ZoneOffset)))
+                      ZoneOffset)
+           (java.time.temporal ChronoUnit)))
 
 (defn- to-epoch [^LocalDateTime ldt]
   (.toEpochSecond ldt ZoneOffset/UTC))
@@ -120,6 +121,11 @@
    (fn [clock]
      (.toLocalDate ^LocalDateTime (:starttime clock)))
    clocks))
+
+(defn get-clock-at-time [db ^LocalDateTime datetime]
+  (clocks-within-timeperiod db
+                            (.truncatedTo datetime ChronoUnit/MINUTES)
+                            (-> datetime (.withSecond 59) (.withNano 999999999))))
 
 ;; For these two functions: clock should be converted with `convert-clock`
 (defn amend-clockin [db clock ^LocalDateTime new-start-date]
