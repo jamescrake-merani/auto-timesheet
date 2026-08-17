@@ -136,7 +136,7 @@
     in-or-out?)))
 
 (defn amend-clock [db in-or-out? ^LocalDateTime oldtime ^LocalDateTime newtime]
-  (let [to-amend (get-clock-at-time db time in-or-out?)]
+  (let [to-amend (get-clock-at-time db oldtime in-or-out?)]
     (if in-or-out?
       (as-db/amend-clockin db {:newstarttime (.toEpochSecond newtime)
                                :oldstarttime (.toEpochSecond oldtime)})
