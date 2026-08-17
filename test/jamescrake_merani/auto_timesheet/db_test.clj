@@ -149,7 +149,7 @@
 (t/deftest amendment-test
   (doseq [datum amendment-test-data]
     (let [db (db-init/open-database ":memory:")]
-      (db-raw/create-category {:name "test"})
+      (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
       (doseq [amendment (:amendments datum)]
