@@ -213,6 +213,26 @@
   (println
    (format "The database is stored in %s" (:sql-directory @config))))
 
+(defn valid-in-or-out? [value]
+  (contains? {"in" "out"} value))
+
+(def amend-spec
+  {:in-or-out {:alias :i
+               :desc "Whether to amend the clock in, or clock out"
+               :validate valid-in-or-out? ;; TODO: Add a failed validation message.
+               :require true}
+   :original-time {:alias :t
+                   :doc "The time of the clock to change."
+                   :require true}
+   :new-time {:alias :n
+              :doc "The new time of the clock to change."
+              :require true}
+   :date {:alias :d
+          :doc "The date of the clock. Defaults to today."}})
+
+(defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
+  (throw (UnsupportedOperationException.)))
+
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
