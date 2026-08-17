@@ -206,11 +206,3 @@
       (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
         (t/is (= (frequencies (:clocks-now datum))
                  (frequencies new-clocks)))))))
-
-;; Plan for amendments test
-;;
-;; Test data includes:
-;; - The clocks in the db.
-;; - The amendments to make
-;; - The new db, which should include the amended db.
-;; - Test gets all of the clocks, and make sure they match the second list.
