@@ -139,9 +139,9 @@
   (let [to-amend (get-clock-at-time db oldtime clock-in?)]
     (if clock-in?
       (as-db/amend-clockin db {:newstarttime (to-epoch newtime)
-                               :originalstarttime (to-epoch oldtime)})
+                               :clockinid (:clockinid to-amend)})
       (as-db/amend-clockout db {:newstoptime (to-epoch newtime)
-                                :originalstoptime (to-epoch oldtime)}))))
+                                :clockoutid (:clockoutid to-amend)}))))
 
 ;; Returns duration.
 (defn sum-clocks [clocks]

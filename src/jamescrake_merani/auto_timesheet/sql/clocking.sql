@@ -112,14 +112,14 @@ where starttime >= :periodstart and starttime <= :periodend;
 -- :result :raw
 update clockin
 set starttime = :newstarttime
-where starttime = :originalstarttime
+where clockinid = :clockinid
 
 -- :name amend-clockout
 -- :command :execute
 -- :result :raw
 update clockout
 set stoptime = :newstoptime
-where stoptime = :originalstoptime
+where clockoutid = :clockoutid
 
 
 -- :name get-category-from-name
