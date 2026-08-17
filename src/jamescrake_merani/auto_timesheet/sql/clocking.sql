@@ -88,7 +88,7 @@ where :i:timeparam >= :periodstart and :i:timeparam <= :periodend;
 -- :command :execute
 -- :result :many
 select *
-from clockin as i;
+from clockin as i
 join clockout as o on i.clockoutid = o.clockoutid;
 
 -- :name delete-clockouts-within-timeperiod
