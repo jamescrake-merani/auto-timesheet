@@ -141,6 +141,11 @@
         (sut/manual-entry db clock-start clock-end "test"))
       (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
 
+(def amendment-test-data
+  [{:clocks [[(LocalDateTime/of 2026 6 11 12 00 25) (LocalDateTime/of 2026 6 11 15 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 12 00) :newtime (LocalDateTime/of 2026 6 11 9 00)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 15 00)]]}])
+
 ;; Plan for amendments test
 ;;
 ;; Test data includes:
