@@ -155,8 +155,8 @@
       (doseq [amendment (:amendments datum)]
         (sut/amend-clock db (:clock-in? amendment) (:oldtime amendment) (:newtime amendment)))
       (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (db-raw/all-clocks db))]
-        (t/is (= (frequencies (:clocks-now amendment-test-data))
-                 (frequencies new-clocks)))))))
+        (t/is (= (frequencies new-clocks)
+                 (frequencies (:clocks-now amendment-test-data))))))))
 
 ;; Plan for amendments test
 ;;
