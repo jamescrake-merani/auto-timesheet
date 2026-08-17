@@ -146,6 +146,18 @@
     :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 12 00) :newtime (LocalDateTime/of 2026 6 11 9 00)}]
     :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 15 00)]]}])
 
+(t/deftest amendment-test
+  (doseq [datum amendment-test-data]
+    (let [db (db-init/open-database ":memory:")]
+      (db-raw/create-category {:name "test"})
+      (doseq [[clock-start clock-end] (:clocks datum)]
+        (sut/manual-entry db clock-start clock-end "test"))
+      (doseq [amendment (:amendments datum)]
+        (sut/amend-clock db (:clock-in? datum) (:oldtime datum) (:newtime datum)))
+      (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (db-raw/all-clocks db))]
+        (t/is (= (frequencies (:clocks-now amendment-test-data))
+                 (frequencies new-clocks)))))))
+
 ;; Plan for amendments test
 ;;
 ;; Test data includes:
