@@ -144,7 +144,56 @@
 (def amendment-test-data
   [{:clocks [[(LocalDateTime/of 2026 6 11 12 00 25) (LocalDateTime/of 2026 6 11 15 00)]]
     :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 12 00) :newtime (LocalDateTime/of 2026 6 11 9 00)}]
-    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 15 00)]]}])
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 15 00)]]}
+   ;; Amend a clock-out time
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 16 30)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 16 30)]]}
+   ;; Amend a clock-in to a later time
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 9 30)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 30) (LocalDateTime/of 2026 6 11 12 00)]]}
+   ;; Amend both the clock-in, and the clock-out of the same clock
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 8 30)}
+                 {:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 17 45)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 8 30) (LocalDateTime/of 2026 6 11 17 45)]]}
+   ;; No amendments: clocks remain unchanged
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments []
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+                 [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]}
+   ;; Multiple clocks: only one clock-out is amended; the rest are untouched
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 16 00)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+                 [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 16 00)]]}
+   ;; Clock-out recorded with seconds: the amendment still matches by the minute
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00 45)]]
+    :amendments [{:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 18 00)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 18 00)]]}
+   ;; Amend one end of each of two different clocks
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 8 45)}
+                 {:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 17 15)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 8 45) (LocalDateTime/of 2026 6 11 12 00)]
+                 [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 15)]]}
+   ;; Chained amendments to the same clock-in
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 8 00)}
+                 {:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 8 00) :newtime (LocalDateTime/of 2026 6 11 7 30)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 7 30) (LocalDateTime/of 2026 6 11 12 00)]]}
+   ;; Three clocks: amend the middle clock's clock-in only
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
+             [(LocalDateTime/of 2026 6 11 11 00) (LocalDateTime/of 2026 6 11 13 00)]
+             [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 18 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 11 00) :newtime (LocalDateTime/of 2026 6 11 11 15)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
+                 [(LocalDateTime/of 2026 6 11 11 15) (LocalDateTime/of 2026 6 11 13 00)]
+                 [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 18 00)]]}])
 
 (t/deftest amendment-test
   (doseq [datum amendment-test-data]
