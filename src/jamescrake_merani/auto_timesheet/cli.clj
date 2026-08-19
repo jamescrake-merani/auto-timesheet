@@ -233,6 +233,7 @@
 (defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
   (let [date-to-use (or date (LocalDate/now))]
     (helpers/amend-clock
+     @db
      (= in-or-out "in")
      (LocalDateTime/of date-to-use (LocalTime/parse original-time))
      (LocalDateTime/of date-to-use (LocalTime/parse new-time)))))
