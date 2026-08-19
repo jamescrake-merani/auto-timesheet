@@ -231,7 +231,11 @@
           :doc "The date of the clock. Defaults to today."}})
 
 (defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
-  (throw (UnsupportedOperationException.)))
+  (let [date-to-use (or date (LocalDate/now))]
+    (helpers/amend-clock
+     (= in-or-out "in")
+     (LocalDateTime/of date-to-use (LocalTime/parse original-time))
+     (LocalDateTime/of date-to-use (LocalTime/parse new-time)))))
 
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
