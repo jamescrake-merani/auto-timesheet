@@ -246,7 +246,7 @@
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
    {:cmds ["directories"] :fn directories :doc "Show the directories of where the config, and database is stored."}
-   {:cmds ["amend"] "fn" amend :doc "Make an amendment to an existing clock in/out." :spec amend-spec}
+   {:cmds ["amend"] :fn amend :doc "Make an amendment to an existing clock in/out." :spec amend-spec}
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
