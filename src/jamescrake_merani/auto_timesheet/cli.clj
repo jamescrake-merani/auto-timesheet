@@ -231,7 +231,7 @@
           :doc "The date of the clock. Defaults to today."}})
 
 (defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
-  (let [date-to-use (or date (LocalDate/now))]
+  (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
     (helpers/amend-clock
      @db
      (= in-or-out "in")
