@@ -23,7 +23,8 @@
 
 (defn make-default-config []
   {:default-category nil
-   :sql-directory (io/file (.dataDir ^ProjectDirectories @directories) "data.db")})
+   :sql-directory (io/file (.dataDir ^ProjectDirectories @directories) "data.db")
+   :default-report "human-readable"})
 
 (defn load-config
   []

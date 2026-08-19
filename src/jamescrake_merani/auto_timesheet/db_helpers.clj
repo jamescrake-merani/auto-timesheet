@@ -22,7 +22,8 @@
                       DayOfWeek
                       Duration
                       Instant
-                      ZoneOffset)))
+                      ZoneOffset)
+           (java.time.temporal ChronoUnit)))
 
 (defn- to-epoch [^LocalDateTime ldt]
   (.toEpochSecond ldt ZoneOffset/UTC))
@@ -89,11 +90,21 @@
                                                 :periodend (to-epoch period-end)})
   (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
                                                :periodend (to-epoch period-end)}))
+(defn clocks-within-timeperiod
+  ([db period-start period-end]
+   (clocks-within-timeperiod db period-start period-end true))
+  ([db period-start period-end use-starttime?]
+   (map convert-clock
+        (as-db/clocks-within-timeperiod
+         db
+         {:periodstart (to-epoch period-start)
+          :periodend (to-epoch period-end)
+          :timeparam (if use-starttime? "starttime" "stoptime")}))))
 
-(defn clocks-within-timeperiod [db period-start period-end]
-  (map convert-clock
-       (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-start)
-                                           :periodend (to-epoch period-end)})))
+(defn clocks-within-date [db ^LocalDate date]
+  (clocks-within-timeperiod db
+                            (LocalDateTime/of date LocalTime/MIDNIGHT)
+                            (LocalDateTime/of (.plusDays date 1) LocalTime/MIDNIGHT)))
 
 (defn clocks-in-week
   ([db] (clocks-in-week db (LocalDateTime/now)))
@@ -102,9 +113,7 @@
                                              (.with DayOfWeek/MONDAY)
                                              (.with LocalTime/MIDNIGHT))
          period-end (.plusWeeks period-beginning 1)]
-     (map convert-clock
-          (as-db/clocks-within-timeperiod db {:periodstart (to-epoch period-beginning)
-                                              :periodend (to-epoch period-end)})))))
+     (clocks-within-timeperiod db period-beginning period-end))))
 
 (defn all-clocks [db]
   (map convert-clock (as-db/all-clocks db)))
@@ -115,6 +124,24 @@
    (fn [clock]
      (.toLocalDate ^LocalDateTime (:starttime clock)))
    clocks))
+
+(defn get-clock-at-time [db ^LocalDateTime datetime clock-in?]
+  ;; TODO: Assumes there will only be one clock at that time. This could fail if
+  ;; this assumption is not true.
+  (first
+   (clocks-within-timeperiod
+    db
+    (.truncatedTo datetime ChronoUnit/MINUTES)
+    (-> datetime (.withSecond 59) (.withNano 999999999))
+    clock-in?)))
+
+(defn amend-clock [db clock-in? ^LocalDateTime oldtime ^LocalDateTime newtime]
+  (let [to-amend (get-clock-at-time db oldtime clock-in?)]
+    (if clock-in?
+      (as-db/amend-clockin db {:newstarttime (to-epoch newtime)
+                               :clockinid (:clockinid to-amend)})
+      (as-db/amend-clockout db {:newstoptime (to-epoch newtime)
+                                :clockoutid (:clockoutid to-amend)}))))
 
 ;; Returns duration.
 (defn sum-clocks [clocks]

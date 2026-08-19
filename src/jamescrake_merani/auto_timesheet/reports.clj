@@ -27,7 +27,7 @@
 
 (defn format-duration [^java.time.Duration d]
   (format "%d hours, %d minutes"
-          (.toHoursPart d)
+          (.toHours d)
           (.toMinutesPart d)))
 
 (defn format-clock [clock]
@@ -45,7 +45,9 @@
 
 ;; TODO: Probably want to make all the locales configurable.
 (defn day-summary [^LocalDate date clocks]
-  (cons (format "%s:" (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK))
+  (cons (format "%s (%s):"
+                (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK)
+                (format-duration (sum-clocks clocks)))
         (map format-clock clocks)))
 
 ;; TODO: Add weekly total.

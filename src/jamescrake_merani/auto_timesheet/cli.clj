@@ -39,44 +39,52 @@
               :desc "The category to clock into. This only needs to be specified if you don't have a default category in your config."}
    :force {:alias :f
            :coerce :boolean
-           :desc "Create a clock in even if you are already clocked in."}})
+           :desc "Create a clock in even if you are already clocked in."}
+   :time {:alias :t
+          :desc "The effective time of the clock. If not specified, then this will be the current time according to your system."}})
+
+(defn- get-effective-datetime [time-from-user]
+  (if time-from-user
+    (LocalDateTime/of (LocalDate/now) (LocalTime/parse time-from-user))
+    (LocalDateTime/now)))
 
 ;: TODO: Probably want to be able to provide a category.
-(defn clockout [{{:keys [category]} :opts}]
+(defn clockout [{{:keys [category time]} :opts}]
   (let [hanging-clockins (helpers/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
-                             (:starttime (first hanging-clockins)))]
+                             (:starttime (first hanging-clockins)))
+        effective-datetime (get-effective-datetime time)]
     (cond (empty? hanging-clockins)
           (do
             (.println ^java.io.PrintWriter *err* "You are not clocked in.")
             (System/exit 1))
           (= (count hanging-clockins) 1)
-          (helpers/clock-out @db)
+          (helpers/clock-out @db effective-datetime)
           (nil? category)
           (do
             (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
             (System/exit 1))
           :else (let [category-id (as-db/get-category-from-name @db {:name category})]
-                  (helpers/clock-out @db category-id)))
+                  (helpers/clock-out @db category-id effective-datetime)))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
-(defn clockin [{{:keys [category force]} :opts}]
-  (let [category-to-use (or category (:default-category @config))]
+(defn clockin [{{:keys [category force time]} :opts}]
+  (let [category-to-use (or category (:default-category @config))
+        effective-datetime (get-effective-datetime time)]
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
       ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
       (nil? category-to-use) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins as you haven't provided a default one in your config.")
                                  (System/exit 1))
       :else (do
-              (helpers/clock-in @db category-to-use)
+              (helpers/clock-in @db category-to-use effective-datetime)
               (println "Clocked in.")))))
 
 (def report-spec
   {:type {:alias :t
-          :require true
           :spec "The type of report to generate."}
    :category {:alias :c
               :spec "Only show clocks from this specific category."}})
@@ -86,7 +94,8 @@
         filter-function (if (nil? category-id)
                           (constantly true)
                           #(= (:categoryid %) category-id))
-        report-function (get reports-available (keyword type))]
+        report-type (or (keyword type) (keyword (:default-report @config)))
+        report-function (get reports-available report-type)]
     (if (and category (nil? category-id))
       (do
         (.println ^java.io.PrintWriter *err* "That category does not exist.")
@@ -97,6 +106,11 @@
         (System/exit 1))
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
+(defn print-reports-available [_]
+  (println "The following report types are implemented:")
+  (doseq [report (keys reports-available)]
+    (println "-" (name report))))
+
 (defn format-clockin [clockin one-clockin?]
   (format "%s %s. %s elapsed since clockin."
           (if one-clockin? "You are currently clocked into" "You are clocked into")
@@ -105,6 +119,12 @@
                                              (LocalDateTime/now)))))
 
 (defn print-status []
+  (println
+   (format "You have clocked in %s today."
+           (-> @db
+               (helpers/clocks-within-date (LocalDate/now))
+               helpers/sum-clocks
+               format-duration)))
   (let [hanging-clockins (helpers/hanging-clockins @db)]
     (cond (empty? hanging-clockins) (println "You are not currently clocked in.")
           (= (count hanging-clockins) 1) (println (format-clockin (first hanging-clockins) true))
@@ -189,18 +209,46 @@
 
 (defn directories [_]
   (println
-   (format "Your config is stored in %s" (.dataDir ^ProjectDirectories @configuration/directories)))
+   (format "Your config is stored in %s" (.configDir ^ProjectDirectories @configuration/directories)))
   (println
    (format "The database is stored in %s" (:sql-directory @config))))
+
+(defn valid-in-or-out? [value]
+  (contains? {"in" "out"} value))
+
+(def amend-spec
+  {:in-or-out {:alias :i
+               :desc "Whether to amend the clock in, or clock out"
+               :validate valid-in-or-out? ;; TODO: Add a failed validation message.
+               :require true}
+   :original-time {:alias :t
+                   :desc "The time of the clock to change."
+                   :require true}
+   :new-time {:alias :n
+              :desc "The new time of the clock to change."
+              :require true}
+   :date {:alias :d
+          :desc "The date of the clock. Defaults to today."}})
+
+(defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
+  (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
+    (helpers/amend-clock
+     @db
+     (= in-or-out "in")
+     (LocalDateTime/of date-to-use (LocalTime/parse original-time))
+     (LocalDateTime/of date-to-use (LocalTime/parse new-time))))
+  (println "Clock amended."))
 
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
+   {:cmds ["reports-available"] :fn print-reports-available :doc "Shows all the reports that are available in this build."}
    {:cmds ["status"] :fn status-command :doc "Shows current clock in status"}
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
    {:cmds ["directories"] :fn directories :doc "Show the directories of where the config, and database is stored."}
+   {:cmds ["amend"] :fn amend :doc "Make an amendment to an existing clock in/out." :spec amend-spec}
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.

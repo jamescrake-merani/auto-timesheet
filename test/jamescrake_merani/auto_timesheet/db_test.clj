@@ -43,7 +43,7 @@
       (let [full-clock (first
                         (sut/clocks-within-timeperiod
                          db (LocalDateTime/of 2026 6 11 0 0)
-                            (LocalDateTime/of 2026 6 11 23 59)))]
+                         (LocalDateTime/of 2026 6 11 23 59)))]
         (verify-duration full-clock (nth datum 2))))))
 
 (t/deftest manual-clock-duration-test
@@ -53,7 +53,7 @@
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       (let [full-clock (first (sut/clocks-within-timeperiod
                                db (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
-                                  (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
+                               (LocalDateTime/of (LocalDate/now) (LocalTime/of 23 59))))]
         (verify-duration full-clock (nth datum 2))))))
 
 (def deletion-clock-test-data
@@ -111,5 +111,98 @@
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
       (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
       (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
-                                                       (second (:period datum))))
+                                                    (second (:period datum))))
                0)))))
+
+(def within-day-clock-test-data
+  [{:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]
+             [(LocalDateTime/of 2026 6 12 9 00) (LocalDateTime/of 2026 6 12 12 00)]]
+    :expected-duration (Duration/ofHours 7)}
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
+             [(LocalDateTime/of 2026 6 11 10 30) (LocalDateTime/of 2026 6 11 12 30)]
+             [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 16 00)]]
+    :expected-duration (Duration/ofHours 6)}
+   {:clocks [[(LocalDateTime/of 2026 6 10 9 00) (LocalDateTime/of 2026 6 10 12 00)]
+             [(LocalDateTime/of 2026 6 12 13 00) (LocalDateTime/of 2026 6 12 17 00)]
+             [(LocalDateTime/of 2026 6 13 8 00) (LocalDateTime/of 2026 6 13 10 00)]]
+    :expected-duration (Duration/ofHours 0)}
+   {:clocks [[(LocalDateTime/of 2026 6 11 7 00) (LocalDateTime/of 2026 6 11 9 00)]
+             [(LocalDateTime/of 2026 6 9 10 00) (LocalDateTime/of 2026 6 9 13 00)]
+             [(LocalDateTime/of 2026 6 11 18 00) (LocalDateTime/of 2026 6 11 20 00)]
+             [(LocalDateTime/of 2026 6 14 8 00) (LocalDateTime/of 2026 6 14 12 00)]]
+    :expected-duration (Duration/ofHours 4)}])
+
+(t/deftest within-day-clocks
+  (doseq [datum within-day-clock-test-data]
+    (let [db (db-init/open-database ":memory:")]
+      (db-raw/create-category db {:name "test"})
+      (doseq [[clock-start clock-end] (:clocks datum)]
+        (sut/manual-entry db clock-start clock-end "test"))
+      (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
+
+(def amendment-test-data
+  [{:clocks [[(LocalDateTime/of 2026 6 11 12 00 25) (LocalDateTime/of 2026 6 11 15 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 12 00) :newtime (LocalDateTime/of 2026 6 11 9 00)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 15 00)]]}
+   ;; Amend a clock-out time
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 16 30)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 16 30)]]}
+   ;; Amend a clock-in to a later time
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 9 30)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 30) (LocalDateTime/of 2026 6 11 12 00)]]}
+   ;; Amend both the clock-in, and the clock-out of the same clock
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 8 30)}
+                 {:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 17 45)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 8 30) (LocalDateTime/of 2026 6 11 17 45)]]}
+   ;; No amendments: clocks remain unchanged
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments []
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+                 [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]}
+   ;; Multiple clocks: only one clock-out is amended; the rest are untouched
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 16 00)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+                 [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 16 00)]]}
+   ;; Clock-out recorded with seconds: the amendment still matches by the minute
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 17 00 45)]]
+    :amendments [{:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 18 00)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 18 00)]]}
+   ;; Amend one end of each of two different clocks
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
+             [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 8 45)}
+                 {:clock-in? false :oldtime (LocalDateTime/of 2026 6 11 17 00) :newtime (LocalDateTime/of 2026 6 11 17 15)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 8 45) (LocalDateTime/of 2026 6 11 12 00)]
+                 [(LocalDateTime/of 2026 6 11 13 00) (LocalDateTime/of 2026 6 11 17 15)]]}
+   ;; Chained amendments to the same clock-in
+   {:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 9 00) :newtime (LocalDateTime/of 2026 6 11 8 00)}
+                 {:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 8 00) :newtime (LocalDateTime/of 2026 6 11 7 30)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 7 30) (LocalDateTime/of 2026 6 11 12 00)]]}
+   ;; Three clocks: amend the middle clock's clock-in only
+   {:clocks [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
+             [(LocalDateTime/of 2026 6 11 11 00) (LocalDateTime/of 2026 6 11 13 00)]
+             [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 18 00)]]
+    :amendments [{:clock-in? true :oldtime (LocalDateTime/of 2026 6 11 11 00) :newtime (LocalDateTime/of 2026 6 11 11 15)}]
+    :clocks-now [[(LocalDateTime/of 2026 6 11 8 00) (LocalDateTime/of 2026 6 11 10 00)]
+                 [(LocalDateTime/of 2026 6 11 11 15) (LocalDateTime/of 2026 6 11 13 00)]
+                 [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 18 00)]]}])
+
+(t/deftest amendment-test
+  (doseq [datum amendment-test-data]
+    (let [db (db-init/open-database ":memory:")]
+      (db-raw/create-category db {:name "test"})
+      (doseq [[clock-start clock-end] (:clocks datum)]
+        (sut/manual-entry db clock-start clock-end "test"))
+      (doseq [amendment (:amendments datum)]
+        (sut/amend-clock db (:clock-in? amendment) (:oldtime amendment) (:newtime amendment)))
+      (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
+        (t/is (= (frequencies (:clocks-now datum))
+                 (frequencies new-clocks)))))))

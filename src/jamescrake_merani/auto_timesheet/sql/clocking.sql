@@ -82,13 +82,13 @@ where clockinid = :clockinid;
 select *
 from clockin as i
 join clockout as o on i.clockoutid = o.clockoutid 
-where i.starttime >= :periodstart and i.starttime <= :periodend
+where :i:timeparam >= :periodstart and :i:timeparam <= :periodend;
 
 -- :name all-clocks
 -- :command :execute
 -- :result :many
 select *
-from clockin as i;
+from clockin as i
 join clockout as o on i.clockoutid = o.clockoutid;
 
 -- :name delete-clockouts-within-timeperiod
@@ -106,6 +106,21 @@ where clockoutid in (
 -- :result :raw
 delete from clockin
 where starttime >= :periodstart and starttime <= :periodend;
+
+-- :name amend-clockin
+-- :command :execute
+-- :result :raw
+update clockin
+set starttime = :newstarttime
+where clockinid = :clockinid
+
+-- :name amend-clockout
+-- :command :execute
+-- :result :raw
+update clockout
+set stoptime = :newstoptime
+where clockoutid = :clockoutid
+
 
 -- :name get-category-from-name
 -- :command :execute
