@@ -213,6 +213,32 @@
   (println
    (format "The database is stored in %s" (:sql-directory @config))))
 
+(defn valid-in-or-out? [value]
+  (contains? {"in" "out"} value))
+
+(def amend-spec
+  {:in-or-out {:alias :i
+               :desc "Whether to amend the clock in, or clock out"
+               :validate valid-in-or-out? ;; TODO: Add a failed validation message.
+               :require true}
+   :original-time {:alias :t
+                   :desc "The time of the clock to change."
+                   :require true}
+   :new-time {:alias :n
+              :desc "The new time of the clock to change."
+              :require true}
+   :date {:alias :d
+          :desc "The date of the clock. Defaults to today."}})
+
+(defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
+  (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
+    (helpers/amend-clock
+     @db
+     (= in-or-out "in")
+     (LocalDateTime/of date-to-use (LocalTime/parse original-time))
+     (LocalDateTime/of date-to-use (LocalTime/parse new-time))))
+  (println "Clock amended."))
+
 (def table
   [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
@@ -222,6 +248,7 @@
    {:cmds ["delete-range"] :fn delete-range-command :spec range-spec :doc "Deletes clocks within a specified range during today."}
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
    {:cmds ["directories"] :fn directories :doc "Show the directories of where the config, and database is stored."}
+   {:cmds ["amend"] :fn amend :doc "Make an amendment to an existing clock in/out." :spec amend-spec}
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
