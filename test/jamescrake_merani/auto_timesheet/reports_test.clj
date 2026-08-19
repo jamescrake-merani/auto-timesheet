@@ -38,7 +38,7 @@
    ["single entry on Monday"
     "2026-06-11T00:00"
     [["2026-06-08T09:00" "2026-06-08T17:00"]]
-    "Monday:\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"]
+    "Monday (8 hours, 0 minutes):\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"]
 
    ["multiple entries across Monday and Thursday"
     "2026-06-11T00:00"
@@ -46,7 +46,7 @@
      ["2026-06-08T13:00" "2026-06-08T16:00"]
      ["2026-06-11T02:00" "2026-06-11T09:30"]
      ["2026-06-11T15:10" "2026-06-11T16:15"]]
-    "Monday:\n10:00-12:00 (2 hours, 0 minutes)\n13:00-16:00 (3 hours, 0 minutes)\nThursday:\n02:00-09:30 (7 hours, 30 minutes)\n15:10-16:15 (1 hours, 5 minutes)\nTotal work completed: 13 hours, 35 minutes"]
+    "Monday (5 hours, 0 minutes):\n10:00-12:00 (2 hours, 0 minutes)\n13:00-16:00 (3 hours, 0 minutes)\nThursday (8 hours, 35 minutes):\n02:00-09:30 (7 hours, 30 minutes)\n15:10-16:15 (1 hours, 5 minutes)\nTotal work completed: 13 hours, 35 minutes"]
 
    ["entries on every weekday"
     "2026-06-12T00:00"
@@ -55,30 +55,30 @@
      ["2026-06-10T09:00" "2026-06-10T10:00"]
      ["2026-06-11T09:00" "2026-06-11T10:00"]
      ["2026-06-12T09:00" "2026-06-12T10:00"]]
-    "Monday:\n09:00-10:00 (1 hours, 0 minutes)\nTuesday:\n09:00-10:00 (1 hours, 0 minutes)\nWednesday:\n09:00-10:00 (1 hours, 0 minutes)\nThursday:\n09:00-10:00 (1 hours, 0 minutes)\nFriday:\n09:00-10:00 (1 hours, 0 minutes)\nTotal work completed: 5 hours, 0 minutes"]
+    "Monday (1 hours, 0 minutes):\n09:00-10:00 (1 hours, 0 minutes)\nTuesday (1 hours, 0 minutes):\n09:00-10:00 (1 hours, 0 minutes)\nWednesday (1 hours, 0 minutes):\n09:00-10:00 (1 hours, 0 minutes)\nThursday (1 hours, 0 minutes):\n09:00-10:00 (1 hours, 0 minutes)\nFriday (1 hours, 0 minutes):\n09:00-10:00 (1 hours, 0 minutes)\nTotal work completed: 5 hours, 0 minutes"]
 
    ["weekend entries appear with correct day names"
     "2026-06-14T00:00"
     [["2026-06-13T11:00" "2026-06-13T14:30"]
      ["2026-06-14T08:00" "2026-06-14T12:00"]]
-    "Saturday:\n11:00-14:30 (3 hours, 30 minutes)\nSunday:\n08:00-12:00 (4 hours, 0 minutes)\nTotal work completed: 7 hours, 30 minutes"]
+    "Saturday (3 hours, 30 minutes):\n11:00-14:30 (3 hours, 30 minutes)\nSunday (4 hours, 0 minutes):\n08:00-12:00 (4 hours, 0 minutes)\nTotal work completed: 7 hours, 30 minutes"]
 
    ["very short one-minute entry"
     "2026-06-11T00:00"
     [["2026-06-09T12:00" "2026-06-09T12:01"]]
-    "Tuesday:\n12:00-12:01 (0 hours, 1 minutes)\nTotal work completed: 0 hours, 1 minutes"]
+    "Tuesday (0 hours, 1 minutes):\n12:00-12:01 (0 hours, 1 minutes)\nTotal work completed: 0 hours, 1 minutes"]
 
    ["late-night entry close to midnight"
     "2026-06-11T00:00"
     [["2026-06-10T22:00" "2026-06-10T23:59"]]
-    "Wednesday:\n22:00-23:59 (1 hours, 59 minutes)\nTotal work completed: 1 hours, 59 minutes"]
+    "Wednesday (1 hours, 59 minutes):\n22:00-23:59 (1 hours, 59 minutes)\nTotal work completed: 1 hours, 59 minutes"]
 
    ["three entries on a single day"
     "2026-06-11T00:00"
     [["2026-06-09T08:00" "2026-06-09T10:00"]
      ["2026-06-09T11:00" "2026-06-09T12:30"]
      ["2026-06-09T14:00" "2026-06-09T16:45"]]
-    "Tuesday:\n08:00-10:00 (2 hours, 0 minutes)\n11:00-12:30 (1 hours, 30 minutes)\n14:00-16:45 (2 hours, 45 minutes)\nTotal work completed: 6 hours, 15 minutes"]])
+    "Tuesday (6 hours, 15 minutes):\n08:00-10:00 (2 hours, 0 minutes)\n11:00-12:30 (1 hours, 30 minutes)\n14:00-16:45 (2 hours, 45 minutes)\nTotal work completed: 6 hours, 15 minutes"]])
 
 (t/deftest human-readable-report-test
   (doseq [[description ref-date entries expected] report-test-data]
@@ -90,36 +90,36 @@
   [;; Two categories, single entry each, same day
    {:data {:work [["2026-06-08T09:00"  "2026-06-08T17:00"]]
             :personal [["2026-06-08T18:00" "2026-06-08T21:00"]]}
-    :expected {:work "Monday:\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"
-               :personal "Monday:\n18:00-21:00 (3 hours, 0 minutes)\nTotal work completed: 3 hours, 0 minutes"}}
+    :expected {:work "Monday (8 hours, 0 minutes):\n09:00-17:00 (8 hours, 0 minutes)\nTotal work completed: 8 hours, 0 minutes"
+               :personal "Monday (3 hours, 0 minutes):\n18:00-21:00 (3 hours, 0 minutes)\nTotal work completed: 3 hours, 0 minutes"}}
 
    ;; Multiple entries per category across different days
    {:data {:work [["2026-06-08T09:00" "2026-06-08T12:00"]
                    ["2026-06-09T14:00" "2026-06-09T18:00"]]
             :personal [["2026-06-10T10:00" "2026-06-10T11:30"]
                         ["2026-06-10T13:00" "2026-06-10T14:00"]]}
-    :expected {:work "Monday:\n09:00-12:00 (3 hours, 0 minutes)\nTuesday:\n14:00-18:00 (4 hours, 0 minutes)\nTotal work completed: 7 hours, 0 minutes"
-               :personal "Wednesday:\n10:00-11:30 (1 hours, 30 minutes)\n13:00-14:00 (1 hours, 0 minutes)\nTotal work completed: 2 hours, 30 minutes"}}
+    :expected {:work "Monday (3 hours, 0 minutes):\n09:00-12:00 (3 hours, 0 minutes)\nTuesday (4 hours, 0 minutes):\n14:00-18:00 (4 hours, 0 minutes)\nTotal work completed: 7 hours, 0 minutes"
+               :personal "Wednesday (2 hours, 30 minutes):\n10:00-11:30 (1 hours, 30 minutes)\n13:00-14:00 (1 hours, 0 minutes)\nTotal work completed: 2 hours, 30 minutes"}}
 
    ;; Three categories
    {:data {:work [["2026-06-08T08:00" "2026-06-08T12:00"]]
             :personal [["2026-06-08T18:00" "2026-06-08T19:30"]]
             :study [["2026-06-09T09:00" "2026-06-09T11:00"]]}
-    :expected {:work "Monday:\n08:00-12:00 (4 hours, 0 minutes)\nTotal work completed: 4 hours, 0 minutes"
-               :personal "Monday:\n18:00-19:30 (1 hours, 30 minutes)\nTotal work completed: 1 hours, 30 minutes"
-               :study "Tuesday:\n09:00-11:00 (2 hours, 0 minutes)\nTotal work completed: 2 hours, 0 minutes"}}
+    :expected {:work "Monday (4 hours, 0 minutes):\n08:00-12:00 (4 hours, 0 minutes)\nTotal work completed: 4 hours, 0 minutes"
+               :personal "Monday (1 hours, 30 minutes):\n18:00-19:30 (1 hours, 30 minutes)\nTotal work completed: 1 hours, 30 minutes"
+               :study "Tuesday (2 hours, 0 minutes):\n09:00-11:00 (2 hours, 0 minutes)\nTotal work completed: 2 hours, 0 minutes"}}
 
    ;; Single category — no other categories in the database
    {:data {:work [["2026-06-11T06:00" "2026-06-11T06:45"]]}
-    :expected {:work "Thursday:\n06:00-06:45 (0 hours, 45 minutes)\nTotal work completed: 0 hours, 45 minutes"}}
+    :expected {:work "Thursday (0 hours, 45 minutes):\n06:00-06:45 (0 hours, 45 minutes)\nTotal work completed: 0 hours, 45 minutes"}}
 
    ;; Both categories have entries on the same days
    {:data {:work [["2026-06-08T09:00" "2026-06-08T12:00"]
                    ["2026-06-09T09:00" "2026-06-09T12:00"]]
             :personal [["2026-06-08T13:00" "2026-06-08T15:00"]
                         ["2026-06-09T13:00" "2026-06-09T14:30"]]}
-    :expected {:work "Monday:\n09:00-12:00 (3 hours, 0 minutes)\nTuesday:\n09:00-12:00 (3 hours, 0 minutes)\nTotal work completed: 6 hours, 0 minutes"
-               :personal "Monday:\n13:00-15:00 (2 hours, 0 minutes)\nTuesday:\n13:00-14:30 (1 hours, 30 minutes)\nTotal work completed: 3 hours, 30 minutes"}}])
+    :expected {:work "Monday (3 hours, 0 minutes):\n09:00-12:00 (3 hours, 0 minutes)\nTuesday (3 hours, 0 minutes):\n09:00-12:00 (3 hours, 0 minutes)\nTotal work completed: 6 hours, 0 minutes"
+               :personal "Monday (2 hours, 0 minutes):\n13:00-15:00 (2 hours, 0 minutes)\nTuesday (1 hours, 30 minutes):\n13:00-14:30 (1 hours, 30 minutes)\nTotal work completed: 3 hours, 30 minutes"}}])
 
 (t/deftest human-readable-report-category-filter-test
   (doseq [datum-map category-filter-test-data]
