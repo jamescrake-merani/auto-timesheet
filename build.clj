@@ -3,7 +3,7 @@
   (:require [clojure.tools.build.api :as b]))
 
 (def lib 'com.github.jamescrake-merani/auto-timesheet)
-(def version "0.1.0")
+(def version "0.2.0")
 (def main 'jamescrake-merani.auto-timesheet.cli)
 (def class-dir "target/classes")
 
