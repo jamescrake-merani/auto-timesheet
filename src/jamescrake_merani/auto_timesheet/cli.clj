@@ -222,13 +222,13 @@
                :validate valid-in-or-out? ;; TODO: Add a failed validation message.
                :require true}
    :original-time {:alias :t
-                   :doc "The time of the clock to change."
+                   :desc "The time of the clock to change."
                    :require true}
    :new-time {:alias :n
-              :doc "The new time of the clock to change."
+              :desc "The new time of the clock to change."
               :require true}
    :date {:alias :d
-          :doc "The date of the clock. Defaults to today."}})
+          :desc "The date of the clock. Defaults to today."}})
 
 (defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
   (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
