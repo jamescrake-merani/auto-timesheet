@@ -8,17 +8,11 @@
                       LocalTime
                       Duration)))
 
-(def db nil)
-
-(defn db-test-fixture [f]
-  (set! db (db-init/open-database ":memory:"))
-  (f))
-
-;; Each, because we want to empty the database for each test run.
-(t/use-fixtures :each db-test-fixture)
+(defn make-db []
+  (db-init/open-database ":memory:"))
 
 (t/deftest clockin-clockout-test
-  (let [db (db-init/open-database ":memory:")]
+  (let [db (make-db)]
     (t/is (= (count (sut/hanging-clockins db)) 0))
     (sut/clock-in db "test")
     (t/is (= (count (sut/hanging-clockins db)) 1))
@@ -46,7 +40,7 @@
 
 (t/deftest clockin-duration-test
   (doseq [datum duration-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (sut/clock-in db "test" (first datum))
       (sut/clock-out db (second datum))
       (let [full-clock (first
@@ -57,7 +51,7 @@
 
 (t/deftest manual-clock-duration-test
   (doseq [datum duration-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       (let [full-clock (first (sut/clocks-within-timeperiod
@@ -113,7 +107,7 @@
 
 (t/deftest deletion-test
   (doseq [datum deletion-clock-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
@@ -144,7 +138,7 @@
 
 (t/deftest within-day-clocks
   (doseq [datum within-day-clock-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
@@ -206,7 +200,7 @@
 
 (t/deftest amendment-test
   (doseq [datum amendment-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
