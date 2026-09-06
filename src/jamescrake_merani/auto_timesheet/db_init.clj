@@ -21,14 +21,18 @@
             [next.jdbc :as jdbc]
             [clojure.java.io :as io]))
 
-(defn init-database [db]
+(defn init-database
+  "Create all the necessary tables in `db`."
+  [db]
   (d/create-category-table db)
   (d/create-clock-in-table db)
   (d/create-clock-out-table db))
 
 ;; TODO: Might be better just to take the project directory, and work out where
 ;; the db should be in there.
-(defn open-database [db-path]
+(defn open-database
+  "Opens the database specified in `db-path`, and initialises the tables."
+  [db-path]
   ;; Make sure the directory exists
   (io/make-parents db-path)
   (h/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))

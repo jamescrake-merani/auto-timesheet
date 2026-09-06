@@ -25,12 +25,16 @@
   (:require [clojure.string :as str]
             [jamescrake-merani.auto-timesheet.db-helpers :refer [group-clocks-by-day clocks-in-week sum-clocks]]))
 
-(defn format-duration [^java.time.Duration d]
+(defn format-duration
+  "Human readable format of `d`"
+  [^java.time.Duration d]
   (format "%d hours, %d minutes"
           (.toHours d)
           (.toMinutesPart d)))
 
-(defn format-clock [clock]
+(defn format-clock
+  "Human readable format of `clock`."
+  [clock]
   (let [time-formatter (DateTimeFormatter/ofPattern "HH:mm")
         ^LocalDateTime start-time (:starttime clock)
         ^LocalDateTime end-time (:stoptime clock)
@@ -44,14 +48,18 @@
 ;; string. This can be done in the CLI code.
 
 ;; TODO: Probably want to make all the locales configurable.
-(defn day-summary [^LocalDate date clocks]
+(defn day-summary
+  "Human readbale summary of all the clocks in `date` (as provided in `clocks`)."
+  [^LocalDate date clocks]
   (cons (format "%s (%s):"
                 (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK)
                 (format-duration (sum-clocks clocks)))
         (map format-clock clocks)))
 
 ;; TODO: Add weekly total.
-(defn human-readable-summary [grouped-clocks]
+(defn human-readable-summary
+  "Create the string for the human-readabley report. Requires clocks to be grouped in `grouped-clocks`"
+  [grouped-clocks]
   (conj
    (reduce-kv (fn [lines day clocks]
                 (into lines (day-summary day clocks)))
@@ -65,6 +73,7 @@
 ;; TODO: Reports should be able to take in parameters. For now, we need to use
 ;; sensible defaults.
 (defn human-readable-report
+  "Create the human readable report."
   ([db] (human-readable-report db (constantly true) (LocalDateTime/now)))
   ([db filter-function] (human-readable-report db filter-function (LocalDateTime/now)))
   ([db filter-function date] (->> (clocks-in-week db date) (filter filter-function) group-clocks-by-day human-readable-summary)))
