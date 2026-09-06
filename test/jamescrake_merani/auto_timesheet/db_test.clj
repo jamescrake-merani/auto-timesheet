@@ -8,6 +8,15 @@
                       LocalTime
                       Duration)))
 
+(def db nil)
+
+(defn db-test-fixture [f]
+  (set! db (db-init/open-database ":memory:"))
+  (f))
+
+;; Each, because we want to empty the database for each test run.
+(t/use-fixtures :each db-test-fixture)
+
 (t/deftest clockin-clockout-test
   (let [db (db-init/open-database ":memory:")]
     (t/is (= (count (sut/hanging-clockins db)) 0))
