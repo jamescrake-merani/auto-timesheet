@@ -105,7 +105,7 @@
     :period [(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 14 00)]
     :expected-remaining-clocks 2}])
 
-(defn setup-test [test-data action-fn assert-fn]
+(defn run-test-scenario [test-data action-fn assert-fn]
   (doseq [datum test-data]
     (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
@@ -115,14 +115,14 @@
       (assert-fn db datum))))
 
 (t/deftest deletion-test
-  (setup-test deletion-clock-test-data
-              (fn [db datum]
-                (sut/delete-clocks db (first (:period datum)) (second (:period datum))))
-              (fn [db datum]
-                (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
-                (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
-                                                              (second (:period datum))))
-                         0)))))
+  (run-test-scenario deletion-clock-test-data
+                     (fn [db datum]
+                       (sut/delete-clocks db (first (:period datum)) (second (:period datum))))
+                     (fn [db datum]
+                       (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
+                       (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
+                                                                     (second (:period datum))))
+                                0)))))
 
 (def within-day-clock-test-data
   [{:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
@@ -144,7 +144,7 @@
     :expected-duration (Duration/ofHours 4)}])
 
 (t/deftest within-day-clocks
-  (setup-test
+  (run-test-scenario
    within-day-clock-test-data
    (constantly nil)
    (fn [db datum]
@@ -205,7 +205,7 @@
                  [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 18 00)]]}])
 
 (t/deftest amendment-test
-  (setup-test
+  (run-test-scenario
    amendment-test-data
    (fn [db datum]
      (doseq [amendment (:amendments datum)]
