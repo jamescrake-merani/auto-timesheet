@@ -105,12 +105,15 @@
     :period [(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 14 00)]
     :expected-remaining-clocks 2}])
 
+(defn setup-test [db test-map]
+  (db-raw/create-category db {:name "test"})
+  (doseq [[clock-start clock-end] (:clocks test-map)]
+    (sut/manual-entry db clock-start clock-end "test")))
+
 (t/deftest deletion-test
   (doseq [datum deletion-clock-test-data]
     (let [db (make-db)]
-      (db-raw/create-category db {:name "test"})
-      (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end "test"))
+      (setup-test db datum)
       (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
       (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
       (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
@@ -139,9 +142,7 @@
 (t/deftest within-day-clocks
   (doseq [datum within-day-clock-test-data]
     (let [db (make-db)]
-      (db-raw/create-category db {:name "test"})
-      (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end "test"))
+      (setup-test db datum)
       (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
 
 (def amendment-test-data
@@ -201,9 +202,7 @@
 (t/deftest amendment-test
   (doseq [datum amendment-test-data]
     (let [db (make-db)]
-      (db-raw/create-category db {:name "test"})
-      (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end "test"))
+      (setup-test db datum)
       (doseq [amendment (:amendments datum)]
         (sut/amend-clock db (:clock-in? amendment) (:oldtime amendment) (:newtime amendment)))
       (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
