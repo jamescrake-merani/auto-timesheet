@@ -8,8 +8,11 @@
                       LocalTime
                       Duration)))
 
+(defn make-db []
+  (db-init/open-database ":memory:"))
+
 (t/deftest clockin-clockout-test
-  (let [db (db-init/open-database ":memory:")]
+  (let [db (make-db)]
     (t/is (= (count (sut/hanging-clockins db)) 0))
     (sut/clock-in db "test")
     (t/is (= (count (sut/hanging-clockins db)) 1))
@@ -37,7 +40,7 @@
 
 (t/deftest clockin-duration-test
   (doseq [datum duration-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (sut/clock-in db "test" (first datum))
       (sut/clock-out db (second datum))
       (let [full-clock (first
@@ -48,7 +51,7 @@
 
 (t/deftest manual-clock-duration-test
   (doseq [datum duration-test-data]
-    (let [db (db-init/open-database ":memory:")]
+    (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       (let [full-clock (first (sut/clocks-within-timeperiod
@@ -102,17 +105,24 @@
     :period [(LocalDateTime/of 2026 6 11 10 00) (LocalDateTime/of 2026 6 11 14 00)]
     :expected-remaining-clocks 2}])
 
-(t/deftest deletion-test
-  (doseq [datum deletion-clock-test-data]
-    (let [db (db-init/open-database ":memory:")]
+(defn run-test-scenario [test-data action-fn assert-fn]
+  (doseq [datum test-data]
+    (let [db (make-db)]
       (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
-      (sut/delete-clocks db (first (:period datum)) (second (:period datum)))
-      (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
-      (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
-                                                    (second (:period datum))))
-               0)))))
+      (action-fn db datum)
+      (assert-fn db datum))))
+
+(t/deftest deletion-test
+  (run-test-scenario deletion-clock-test-data
+                     (fn [db datum]
+                       (sut/delete-clocks db (first (:period datum)) (second (:period datum))))
+                     (fn [db datum]
+                       (t/is (= (count (sut/all-clocks db)) (:expected-remaining-clocks datum)))
+                       (t/is (= (count (sut/clocks-within-timeperiod db (first (:period datum))
+                                                                     (second (:period datum))))
+                                0)))))
 
 (def within-day-clock-test-data
   [{:clocks [[(LocalDateTime/of 2026 6 11 9 00) (LocalDateTime/of 2026 6 11 12 00)]
@@ -134,12 +144,11 @@
     :expected-duration (Duration/ofHours 4)}])
 
 (t/deftest within-day-clocks
-  (doseq [datum within-day-clock-test-data]
-    (let [db (db-init/open-database ":memory:")]
-      (db-raw/create-category db {:name "test"})
-      (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end "test"))
-      (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
+  (run-test-scenario
+   within-day-clock-test-data
+   (constantly nil)
+   (fn [db datum]
+     (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
 
 (def amendment-test-data
   [{:clocks [[(LocalDateTime/of 2026 6 11 12 00 25) (LocalDateTime/of 2026 6 11 15 00)]]
@@ -196,13 +205,12 @@
                  [(LocalDateTime/of 2026 6 11 14 00) (LocalDateTime/of 2026 6 11 18 00)]]}])
 
 (t/deftest amendment-test
-  (doseq [datum amendment-test-data]
-    (let [db (db-init/open-database ":memory:")]
-      (db-raw/create-category db {:name "test"})
-      (doseq [[clock-start clock-end] (:clocks datum)]
-        (sut/manual-entry db clock-start clock-end "test"))
-      (doseq [amendment (:amendments datum)]
-        (sut/amend-clock db (:clock-in? amendment) (:oldtime amendment) (:newtime amendment)))
-      (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
-        (t/is (= (frequencies (:clocks-now datum))
-                 (frequencies new-clocks)))))))
+  (run-test-scenario
+   amendment-test-data
+   (fn [db datum]
+     (doseq [amendment (:amendments datum)]
+       (sut/amend-clock db (:clock-in? amendment) (:oldtime amendment) (:newtime amendment))))
+   (fn [db datum]
+     (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
+       (t/is (= (frequencies (:clocks-now datum))
+                (frequencies new-clocks)))))))
