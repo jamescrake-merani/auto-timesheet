@@ -146,7 +146,7 @@
 (t/deftest within-day-clocks
   (setup-test
    within-day-clock-test-data
-   (fn [db datum] nil)
+   (constantly nil)
    (fn [db datum]
      (t/is (= (sut/sum-clocks (sut/clocks-within-date db (LocalDate/of 2026 6 11))) (:expected-duration datum))))))
 
