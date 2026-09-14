@@ -53,9 +53,9 @@
 ;: TODO: Probably want to be able to provide a category.
 (defn clockout
   "Perform a clock out. `category` is the string of the category which is first to
-  be fetched. If none is specified, the config will be checked, and if not is
-  specified either, the program will error. `time` is the effective time. If
-  not specified, it'll be the current time."
+  be fetched. If none is specified, the config will be checked, and if none is
+  specified there either, the program will error. `time` is the effective time.
+  If not specified, it'll be the current time."
   [{{:keys [category time]} :opts}]
   (let [hanging-clockins (helpers/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
@@ -80,11 +80,11 @@
 ;; TODO: Also this check only looks for all categories not one specific one.
 (defn clockin
   "Perform a clock in. `category` is the string of the category which is first to
-  be fetched. If none is specified, the config will be checked, and if not is
-  specified either, the program will error. The database will be checked to see
-  if there already is a clock in for the category. If `force` is true, this
-  check is overrided. `time` is the effective time. If not specified, it'll be
-  the current time."
+  be fetched. If none is specified, the config will be checked, and if none is
+  specified there either, the program will error. The database will be checked
+  to see if there already is a clock in for the category. If `force` is true,
+  this check is overrided. `time` is the effective time. If not specified, it'll
+  be the current time."
   [{{:keys [category force time]} :opts}]
   (let [category-to-use (or category (:default-category @config))
         effective-datetime (get-effective-datetime time)]
