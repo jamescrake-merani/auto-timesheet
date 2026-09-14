@@ -43,13 +43,20 @@
    :time {:alias :t
           :desc "The effective time of the clock. If not specified, then this will be the current time according to your system."}})
 
-(defn- get-effective-datetime [time-from-user]
+(defn- get-effective-datetime
+  "Get the datetime which should be used as 'today'"
+  [time-from-user]
   (if time-from-user
     (LocalDateTime/of (LocalDate/now) (LocalTime/parse time-from-user))
     (LocalDateTime/now)))
 
 ;: TODO: Probably want to be able to provide a category.
-(defn clockout [{{:keys [category time]} :opts}]
+(defn clockout
+  "Perform a clock out. `category` is the string of the category which is first to
+  be fetched. If none is specified, the config will be checked, and if not is
+  specified either, the program will error. `time` is the effective time. If
+  not specified, it'll be the current time."
+  [{{:keys [category time]} :opts}]
   (let [hanging-clockins (helpers/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
                              (:starttime (first hanging-clockins)))
@@ -71,7 +78,14 @@
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
-(defn clockin [{{:keys [category force time]} :opts}]
+(defn clockin
+  "Perform a clock in. `category` is the string of the category which is first to
+  be fetched. If none is specified, the config will be checked, and if not is
+  specified either, the program will error. The database will be checked to see
+  if there already is a clock in for the category. If `force` is true, this
+  check is overrided. `time` is the effective time. If not specified, it'll be
+  the current time."
+  [{{:keys [category force time]} :opts}]
   (let [category-to-use (or category (:default-category @config))
         effective-datetime (get-effective-datetime time)]
     (cond
@@ -89,7 +103,10 @@
    :category {:alias :c
               :spec "Only show clocks from this specific category."}})
 
-(defn report [{{:keys [type category]} :opts}]
+(defn report
+  "Prints the report specified by `type`. Optionally, `category` can be specified
+  which will filter clocks for just that category."
+  [{{:keys [type category]} :opts}]
   (let [category-id (if category (:categoryid (as-db/get-category-from-name @db {:name category})))
         filter-function (if (nil? category-id)
                           (constantly true)
@@ -106,7 +123,9 @@
         (System/exit 1))
       (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
 
-(defn print-reports-available [_]
+(defn print-reports-available
+  "Prints the reports which are available to be viewed from the report command."
+  [_]
   (println "The following report types are implemented:")
   (doseq [report (keys reports-available)]
     (println "-" (name report))))
@@ -118,7 +137,9 @@
           (format-duration (Duration/between (:starttime clockin)
                                              (LocalDateTime/now)))))
 
-(defn print-status []
+(defn print-status
+  "Print the current status message."
+  []
   (println
    (format "You have clocked in %s today."
            (-> @db
@@ -135,7 +156,9 @@
 
 ;; TODO: Display all clock ins.
 
-(defn print-clocks [clocks]
+(defn print-clocks
+  "Print `clocks` into one human readable string."
+  [clocks]
   (println
    (str/join "\n"
              (map (fn [clock]
@@ -157,7 +180,9 @@
           :desc "The date of both the start, and end time."}})
 
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
-(defn delete-range-command [{{:keys [start-time end-time date]} :opts}]
+(defn delete-range-command
+  "Prompt the user to delete all clocks within a specified time range."
+  [{{:keys [start-time end-time date]} :opts}]
   (let [period-date (if (nil? date) (LocalDate/now) (LocalDate/parse date))
         period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
         period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
@@ -179,10 +204,14 @@
             (println "Deleted."))
           (println "Cancelled."))))))
 
-(defn status-command [_]
+(defn status-command
+  "Print the status command."
+  [_]
   (print-status))
 
-(defn no-command [opts]
+(defn no-command
+  "Print the appropriate message when no command has been provided."
+  [opts]
   ;; If args is nil, no subcommand was provided so we can assume the user wants
   ;; the status. Otherwise, we assume the user entered a subcommand that does
   ;; not exist, and thus we give them a warning.
@@ -199,7 +228,9 @@
                                :require true
                                :desc "The category of this manual entry."}))
 
-(defn manual-entry [{{:keys [start-time end-time date category]} :opts}]
+(defn manual-entry
+  "Create a manual entry from values parsed from strings."
+  [{{:keys [start-time end-time date category]} :opts}]
   (let [start-local-time (LocalTime/parse start-time)
         end-local-time (LocalTime/parse end-time)
         local-date (if date (LocalDate/parse date))]
@@ -207,13 +238,17 @@
       (helpers/manual-entry @db (LocalDateTime/of local-date start-local-time) (LocalDateTime/of local-date end-local-time) category)
       (helpers/manual-entry @db start-local-time end-local-time category))))
 
-(defn directories [_]
+(defn directories
+  "Print out the directories as fetched by ProjectDirectories"
+  [_]
   (println
    (format "Your config is stored in %s" (.configDir ^ProjectDirectories @configuration/directories)))
   (println
    (format "The database is stored in %s" (:sql-directory @config))))
 
-(defn valid-in-or-out? [value]
+(defn valid-in-or-out?
+  "Check that `value` is the string literal in, or out."
+  [value]
   (contains? {"in" "out"} value))
 
 (def amend-spec
@@ -230,7 +265,12 @@
    :date {:alias :d
           :desc "The date of the clock. Defaults to today."}})
 
-(defn amend [{{:keys [in-or-out original-time new-time date]} :opts}]
+(defn amend
+  "Fetch a clock in/out (as specified by `in-or-out`) based on its
+  `original-time`, and `date`, and amend it to `new-time`. `original-time` is
+  expected just to be the minutes, and seconds. The DB will then look for a
+  range between the lower, and upper limit of that time."
+  [{{:keys [in-or-out original-time new-time date]} :opts}]
   (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
     (helpers/amend-clock
      @db
@@ -252,7 +292,9 @@
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
-(defn -main [& args]
+(defn -main
+  "Entry function for the CLI."
+  [& args]
   (cli/dispatch table args {:error-fn (fn [{:keys [spec type cause msg option] :as data}]
                                         (if (= :org.babashka/cli type)
                                           (.println ^java.io.PrintWriter *err* msg)
