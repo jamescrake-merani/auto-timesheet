@@ -49,7 +49,7 @@
 
 ;; TODO: Probably want to make all the locales configurable.
 (defn day-summary
-  "Human readbale summary of all the clocks in `date` (as provided in `clocks`)."
+  "Human readable summary of all the clocks in `date` (as provided in `clocks`)."
   [^LocalDate date clocks]
   (cons (format "%s (%s):"
                 (.getDisplayName (.getDayOfWeek date) TextStyle/FULL Locale/UK)
@@ -58,7 +58,7 @@
 
 ;; TODO: Add weekly total.
 (defn human-readable-summary
-  "Create the string for the human-readabley report. Requires clocks to be grouped in `grouped-clocks`"
+  "Create the string for the human-readable report. Requires clocks to be grouped in `grouped-clocks`"
   [grouped-clocks]
   (conj
    (reduce-kv (fn [lines day clocks]

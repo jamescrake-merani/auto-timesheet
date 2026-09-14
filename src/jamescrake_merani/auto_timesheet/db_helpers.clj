@@ -113,7 +113,7 @@
   (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
                                                :periodend (to-epoch period-end)}))
 (defn clocks-within-timeperiod
-  "Return all the clocks that fill within `period-start`, and `period-end`."
+  "Return all the clocks that fall within `period-start`, and `period-end`."
   ([db period-start period-end]
    (clocks-within-timeperiod db period-start period-end true))
   ([db period-start period-end use-starttime?]
