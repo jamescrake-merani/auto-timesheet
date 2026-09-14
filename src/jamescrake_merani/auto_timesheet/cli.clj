@@ -266,10 +266,10 @@
           :desc "The date of the clock. Defaults to today."}})
 
 (defn amend
-  "Fetch a clock in/out (as specified by `in-or-out`) based on its
-  `original-time`, and `date`, and amend it to `new-time`. `original-time` is
-  expected just to be the minutes, and seconds. The DB will then look for a
-  range between the lower, and upper limit of that time."
+  "Fetch a clock in/out (as specified by `in-or-out`) based on its `original-time`,
+  and `date`, and amend it to `new-time`. `original-time` is expected just be a
+  string with only the minute, and second components of the time. The DB will
+  then look for a range between the lower, and upper limit of that time."
   [{{:keys [in-or-out original-time new-time date]} :opts}]
   (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
     (helpers/amend-clock
