@@ -56,7 +56,6 @@
     (LocalDateTime/of (LocalDate/now) (LocalTime/parse time-from-user))
     (LocalDateTime/now)))
 
-;: TODO: Probably want to be able to provide a category.
 (defn clockout
   "Perform a clock out. `category` is the string of the category which is first to
   be fetched. If none is specified, the config will be checked, and if none is
