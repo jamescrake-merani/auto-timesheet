@@ -47,6 +47,11 @@
                  [key value])) clock)))
 
 (defn category-to-id
+  "Returns the id associated with the given category. `raw-category` can either be
+  a int, in which case its presumed to already be a category id, and returned
+  straight away. Or it can be a string/keyword, in which case a category is
+  looked up in the database. If one can't be found with that name, one is
+  created."
   [db raw-category]
   (cond
     (integer? raw-category) raw-category
