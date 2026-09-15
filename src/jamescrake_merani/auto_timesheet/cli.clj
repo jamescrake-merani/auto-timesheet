@@ -72,7 +72,7 @@
           (helpers/clock-out @db effective-datetime)
           (nil? category)
           (error-and-quit "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
-          :else (helpers/clock-out @db (helpers/category-to-id category true) effective-datetime))
+          :else (helpers/clock-out @db (helpers/category-to-id @db category true) effective-datetime))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
