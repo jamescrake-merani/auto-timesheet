@@ -106,7 +106,7 @@
   "Prints the report specified by `type`. Optionally, `category` can be specified
   which will filter clocks for just that category."
   [{{:keys [type category]} :opts}]
-  (let [category-id (if category (:categoryid (as-db/get-category-from-name @db {:name category})))
+  (let [category-id (if category (helpers/category-to-id @db category true))
         filter-function (if (nil? category-id)
                           (constantly true)
                           #(= (:categoryid %) category-id))
