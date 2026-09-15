@@ -27,7 +27,8 @@
                       LocalDateTime
                       LocalDate
                       LocalTime)
-           (dev.dirs ProjectDirectories))
+           (dev.dirs ProjectDirectories)
+           (clojure.lang ExceptionInfo))
   (:gen-class))
 
 (defn- error-and-quit [error-message]
@@ -116,7 +117,7 @@
       (if (nil? report-function)
         (error-and-quit "That report type does not exist.")
         (println (->> (report-function @db filter-function) flatten (str/join "\n")))))
-    (catch Exception e
+    (catch ExceptionInfo e
       (error-and-quit (ex-message e)))))
 
 (defn print-reports-available
