@@ -46,6 +46,18 @@
                  [key (from-epoch value)]
                  [key value])) clock)))
 
+(defn category-to-id
+  [db raw-category]
+  (cond
+    (integer? raw-category) raw-category
+    (or (keyword? raw-category) (string? raw-category))
+    (let [category-id (as-db/get-category-from-name db {:name raw-category})]
+      (if (nil? category-id)
+        (as-db/create-category db {:name raw-category})
+        category-id))
+    :else
+    (throw (Exception. "Category needs to be an id, or a name."))))
+
 (defn clock-in
   "Make a clock in. `category` needs to be specified, and optionally
   `current-timestamp` can be specified if the clock in is to be made at a
@@ -53,16 +65,8 @@
   time."
   ([db category] (clock-in db category (LocalDateTime/now)))
   ([db category current-timestamp]
-   (cond (integer? category)
-         (as-db/clock-in db {:category-id category :starttime (to-epoch current-timestamp)})
-         (or (keyword? category) (string? category))
-         (let [category-id (as-db/get-category-from-name db {:name category})]
-           (if (nil? category-id)
-             (clock-in db (:categoryid (as-db/create-category db {:name category})) current-timestamp)
-             (as-db/clock-in db {:category-id (:categoryid (as-db/get-category-from-name db {:name category}))
-                                 :starttime (to-epoch current-timestamp)})))
-         :else
-         (throw (Exception. "Category needs to be an id, or a name.")))))
+   (as-db/clock-in db {:category-id (category-to-id db category)
+                       :starttime (to-epoch current-timestamp)})))
 
 (defn- hanging-clockin-id [db]
   (-> (as-db/hanging-clockins db) first :clockinid))
