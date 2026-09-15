@@ -108,7 +108,6 @@
 (defn run-test-scenario [test-data action-fn assert-fn]
   (doseq [datum test-data]
     (let [db (make-db)]
-      (db-raw/create-category db {:name "test"})
       (doseq [[clock-start clock-end] (:clocks datum)]
         (sut/manual-entry db clock-start clock-end "test"))
       (action-fn db datum)
