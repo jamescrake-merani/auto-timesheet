@@ -56,9 +56,9 @@
   (cond
     (integer? raw-category) raw-category
     (or (keyword? raw-category) (string? raw-category))
-    (let [category-id (as-db/get-category-from-name db {:name raw-category})]
+    (let [category-id (:categoryid (as-db/get-category-from-name db {:name raw-category}))]
       (if (nil? category-id)
-        (as-db/create-category db {:name raw-category})
+        (:categoryid (as-db/create-category db {:name raw-category}))
         category-id))
     :else
     (throw (Exception. "Category needs to be an id, or a name."))))
