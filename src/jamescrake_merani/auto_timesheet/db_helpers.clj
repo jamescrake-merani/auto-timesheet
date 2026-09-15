@@ -51,12 +51,16 @@
   a int, in which case its presumed to already be a category id, and returned
   straight away. Or it can be a string/keyword, in which case a category is
   looked up in the database. If one can't be found with that name, one is
-  created."
-  [db raw-category]
+  created unless `check-category-exists?` is true."
+  [db raw-category & [check-category-exists?]]
   (cond
     (integer? raw-category) raw-category
     (or (keyword? raw-category) (string? raw-category))
     (let [category-id (:categoryid (as-db/get-category-from-name db {:name raw-category}))]
+      (cond
+        category-id category-id
+        (not check-category-exists?) (:categoryid (as-db/create-category db {:name raw-category}))
+        :else (throw (Exception. "Category does not exist")))
       (if (nil? category-id)
         (:categoryid (as-db/create-category db {:name raw-category}))
         category-id))
