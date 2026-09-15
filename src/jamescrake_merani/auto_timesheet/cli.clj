@@ -27,8 +27,14 @@
                       LocalDateTime
                       LocalDate
                       LocalTime)
-           (dev.dirs ProjectDirectories))
+           (dev.dirs ProjectDirectories)
+           (clojure.lang ExceptionInfo))
   (:gen-class))
+
+(defn- error-and-quit [error-message]
+  (do
+    (.println ^java.io.PrintWriter *err* error-message)
+    (System/exit 1)))
 
 (def config (delay (configuration/load-config)))
 ;; TODO: I'm not sure whether this should be at this level.
@@ -50,7 +56,6 @@
     (LocalDateTime/of (LocalDate/now) (LocalTime/parse time-from-user))
     (LocalDateTime/now)))
 
-;: TODO: Probably want to be able to provide a category.
 (defn clockout
   "Perform a clock out. `category` is the string of the category which is first to
   be fetched. If none is specified, the config will be checked, and if none is
@@ -62,17 +67,12 @@
                              (:starttime (first hanging-clockins)))
         effective-datetime (get-effective-datetime time)]
     (cond (empty? hanging-clockins)
-          (do
-            (.println ^java.io.PrintWriter *err* "You are not clocked in.")
-            (System/exit 1))
+          (error-and-quit "You are not clocked in.")
           (= (count hanging-clockins) 1)
           (helpers/clock-out @db effective-datetime)
           (nil? category)
-          (do
-            (.println ^java.io.PrintWriter *err* "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
-            (System/exit 1))
-          :else (let [category-id (as-db/get-category-from-name @db {:name category})]
-                  (helpers/clock-out @db category-id effective-datetime)))
+          (error-and-quit "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
+          :else (helpers/clock-out @db (helpers/category-to-id @db category true) effective-datetime))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
@@ -91,8 +91,7 @@
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
       ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
-      (nil? category-to-use) (do (.println ^java.io.PrintWriter *err*  "You need to provide a category with clock ins as you haven't provided a default one in your config.")
-                                 (System/exit 1))
+      (nil? category-to-use) (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config.")
       :else (do
               (helpers/clock-in @db category-to-use effective-datetime)
               (println "Clocked in.")))))
@@ -107,21 +106,18 @@
   "Prints the report specified by `type`. Optionally, `category` can be specified
   which will filter clocks for just that category."
   [{{:keys [type category]} :opts}]
-  (let [category-id (if category (:categoryid (as-db/get-category-from-name @db {:name category})))
-        filter-function (if (nil? category-id)
-                          (constantly true)
-                          #(= (:categoryid %) category-id))
-        report-type (or (keyword type) (keyword (:default-report @config)))
-        report-function (get reports-available report-type)]
-    (if (and category (nil? category-id))
-      (do
-        (.println ^java.io.PrintWriter *err* "That category does not exist.")
-        (System/exit 1)))
-    (if (nil? report-function)
-      (do
-        (.println ^java.io.PrintWriter *err* "That report type does not exist.")
-        (System/exit 1))
-      (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
+  (try
+    (let [category-id (if category (helpers/category-to-id @db category true))
+          filter-function (if (nil? category-id)
+                            (constantly true)
+                            #(= (:categoryid %) category-id))
+          report-type (or (keyword type) (keyword (:default-report @config)))
+          report-function (get reports-available report-type)]
+      (if (nil? report-function)
+        (error-and-quit "That report type does not exist.")
+        (println (->> (report-function @db filter-function) flatten (str/join "\n")))))
+    (catch ExceptionInfo e
+      (error-and-quit (ex-message e)))))
 
 (defn print-reports-available
   "Prints the reports which are available to be viewed from the report command."
@@ -192,9 +188,7 @@
          period-start
          period-end)]
     (if (empty? to-remove)
-      (do
-        (.println ^java.io.PrintWriter *err* "No clocks were found in the period you specified.")
-        (System/exit 1))
+      (error-and-quit "No clocks were found in the period you specified.")
       (do
         (print-clocks to-remove)
         (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
@@ -219,9 +213,7 @@
     (do
       (print-status)
       (println "Run 'auto-timesheet --help' for a list of all commands."))
-    (do
-      (.println ^java.io.PrintWriter *err* "The command you provided does not exist. Run 'auto-timesheet --help' for a list of all commands.")
-      (System/exit 1))))
+    (error-and-quit "The command you provided does not exist. Run 'auto-timesheet --help' for a list of all commands.")))
 
 (def manual-entry-spec
   (assoc range-spec :category {:alias :c
