@@ -95,12 +95,11 @@
     date-or-time
     (LocalDateTime/of (LocalDate/now) date-or-time)))
 
-;; TODO: Doesn't do the same category checks as `clock-in`
 (defn manual-entry
   "Manually create a clock in, and clock out in one go by specifying the times for
   clock in, and clock out."
   [db clockin-time clockout-time category]
-  (let [category-id (:categoryid (as-db/get-category-from-name db {:name category}))
+  (let [category-id (:categoryid (category-to-id category))
         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
         ;; are both times without dates but this may not always be the case.
         clockin-starttime (full-date clockin-time)
