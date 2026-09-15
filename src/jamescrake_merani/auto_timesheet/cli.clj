@@ -106,17 +106,18 @@
   "Prints the report specified by `type`. Optionally, `category` can be specified
   which will filter clocks for just that category."
   [{{:keys [type category]} :opts}]
-  (let [category-id (if category (helpers/category-to-id @db category true))
-        filter-function (if (nil? category-id)
-                          (constantly true)
-                          #(= (:categoryid %) category-id))
-        report-type (or (keyword type) (keyword (:default-report @config)))
-        report-function (get reports-available report-type)]
-    (if (and category (nil? category-id))
-      (error-and-quit "That category does not exist."))
-    (if (nil? report-function)
-      (error-and-quit "That report type does not exist.")
-      (println (->> (report-function @db filter-function) flatten (str/join "\n"))))))
+  (try
+    (let [category-id (if category (helpers/category-to-id @db category true))
+          filter-function (if (nil? category-id)
+                            (constantly true)
+                            #(= (:categoryid %) category-id))
+          report-type (or (keyword type) (keyword (:default-report @config)))
+          report-function (get reports-available report-type)]
+      (if (nil? report-function)
+        (error-and-quit "That report type does not exist.")
+        (println (->> (report-function @db filter-function) flatten (str/join "\n")))))
+    (catch Exception e
+      (error-and-quit (ex-message e)))))
 
 (defn print-reports-available
   "Prints the reports which are available to be viewed from the report command."

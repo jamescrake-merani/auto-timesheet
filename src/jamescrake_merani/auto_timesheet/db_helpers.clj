@@ -60,7 +60,7 @@
       (cond
         category-id category-id
         (not must-exist?) (:categoryid (as-db/create-category db {:name raw-category}))
-        :else (throw (Exception. "Category does not exist"))))
+        :else (throw (ex-info "Category does not exist" {:category raw-category}))))
     :else
     (throw (Exception. "Category needs to be an id, or a name."))))
 
