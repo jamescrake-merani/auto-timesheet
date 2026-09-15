@@ -52,7 +52,6 @@
 (t/deftest manual-clock-duration-test
   (doseq [datum duration-test-data]
     (let [db (make-db)]
-      (db-raw/create-category db {:name "test"})
       (sut/manual-entry db (.toLocalTime (first datum)) (.toLocalTime (second datum)) "test")
       (let [full-clock (first (sut/clocks-within-timeperiod
                                db (LocalDateTime/of (LocalDate/now) (LocalTime/of 0 0))
