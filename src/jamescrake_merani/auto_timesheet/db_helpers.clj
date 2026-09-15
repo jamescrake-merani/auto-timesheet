@@ -60,10 +60,7 @@
       (cond
         category-id category-id
         (not check-category-exists?) (:categoryid (as-db/create-category db {:name raw-category}))
-        :else (throw (Exception. "Category does not exist")))
-      (if (nil? category-id)
-        (:categoryid (as-db/create-category db {:name raw-category}))
-        category-id))
+        :else (throw (Exception. "Category does not exist"))))
     :else
     (throw (Exception. "Category needs to be an id, or a name."))))
 
