@@ -104,7 +104,7 @@
   "Manually create a clock in, and clock out in one go by specifying the times for
   clock in, and clock out."
   [db clockin-time clockout-time category]
-  (let [category-id (:categoryid (category-to-id db category))
+  (let [category-id (category-to-id db category)
         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
         ;; are both times without dates but this may not always be the case.
         clockin-starttime (full-date clockin-time)
