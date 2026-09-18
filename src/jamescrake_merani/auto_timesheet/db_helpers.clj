@@ -118,11 +118,14 @@
 
 (defn delete-clocks
   "Delete all clock ins, and clock outs which lie within `period-start`, and `period-end`."
-  [db period-start period-end]
-  (as-db/delete-clockouts-within-timeperiod db {:periodstart (to-epoch period-start)
-                                                :periodend (to-epoch period-end)})
-  (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
-                                               :periodend (to-epoch period-end)}))
+  ([db period-start period-end]
+   (as-db/delete-clockouts-within-timeperiod db {:periodstart (to-epoch period-start)
+                                                 :periodend (to-epoch period-end)})
+   (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
+                                                :periodend (to-epoch period-end)}))
+  ([db time-range]
+   (delete-clocks db (:start-date-time time-range) (:end-date-time time-range))))
+
 (defn clocks-within-timeperiod
   "Return all the clocks that fall within `period-start`, and `period-end`."
   ([db period-start period-end]
