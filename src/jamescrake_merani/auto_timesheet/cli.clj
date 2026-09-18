@@ -180,6 +180,13 @@
 (defn parse-date-offset [start-date offset-str]
   (.plusDays ^LocalDateTime start-date (parse-long offset-str)))
 
+(defrecord TimeRange [start-date-time end-date-time])
+
+(defn parse-range [start-time end-time date-str end-date-offset]
+  (let [date (if (nil? date-str) (LocalDate/now) (LocalDate/parse date))]
+    (->TimeRange (LocalDateTime/of date (LocalTime/parse start-time))
+                 (LocalDateTime/of (parse-date-offset date end-date-offset) (LocalTime/parse end-time)))))
+
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command
   "Prompt the user to delete all clocks within a specified time range."
