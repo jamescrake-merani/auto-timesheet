@@ -183,7 +183,7 @@
 (defrecord TimeRange [start-date-time end-date-time])
 
 (defn parse-range [start-time end-time date-str end-date-offset]
-  (let [date (if (nil? date-str) (LocalDate/now) (LocalDate/parse date))]
+  (let [date (if (nil? date-str) (LocalDate/now) (LocalDate/parse date-str))]
     (->TimeRange (LocalDateTime/of date (LocalTime/parse start-time))
                  (LocalDateTime/of (parse-date-offset date end-date-offset) (LocalTime/parse end-time)))))
 
