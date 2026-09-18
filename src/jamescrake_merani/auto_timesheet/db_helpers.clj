@@ -25,6 +25,8 @@
                       ZoneOffset)
            (java.time.temporal ChronoUnit)))
 
+(defrecord TimeRange [start-date-time end-date-time])
+
 (defn- to-epoch
   "Converts `ldt` to seconds since the UTC epoch."
   [^LocalDateTime ldt]
