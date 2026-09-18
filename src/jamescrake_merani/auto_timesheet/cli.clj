@@ -228,14 +228,13 @@
 
 (def manual-entry-spec
   (assoc range-spec :category {:alias :c
-                               :require true
                                :desc "The category of this manual entry."}))
 
 (defn manual-entry
   "Create a manual entry from values parsed from strings."
   [{{:keys [start-time end-time date end-date-offset category]} :opts}]
   (let [time-range (parse-range start-time end-time date end-date-offset)]
-    (helpers/manual-entry @db time-range category)))
+    (helpers/manual-entry @db time-range (get-category-to-use category))))
 
 (defn directories
   "Print out the directories as fetched by ProjectDirectories"
