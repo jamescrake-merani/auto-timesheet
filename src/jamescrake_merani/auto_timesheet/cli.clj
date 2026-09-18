@@ -177,13 +177,16 @@
    :end-date-offset {:alias :o
                      :desc "The amount of days to add onto the start date for the end date."}})
 
+(defn parse-date-offset [start-date offset-str]
+  (.plusDays ^LocalDateTime start-date (parse-long offset-str)))
+
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command
   "Prompt the user to delete all clocks within a specified time range."
-  [{{:keys [start-time end-time date]} :opts}]
+  [{{:keys [start-time end-time date end-date-offset]} :opts}]
   (let [period-date (if (nil? date) (LocalDate/now) (LocalDate/parse date))
         period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
-        period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
+        period-end (LocalDateTime/of (parse-date-offset period-date end-date-offset) (LocalTime/parse end-time))
         to-remove
         (helpers/clocks-within-timeperiod
          @db
@@ -224,7 +227,7 @@
 
 (defn manual-entry
   "Create a manual entry from values parsed from strings."
-  [{{:keys [start-time end-time date category]} :opts}]
+  [{{:keys [start-time end-time date end-date-offset category]} :opts}]
   (let [start-local-time (LocalTime/parse start-time)
         end-local-time (LocalTime/parse end-time)
         local-date (if date (LocalDate/parse date))]
