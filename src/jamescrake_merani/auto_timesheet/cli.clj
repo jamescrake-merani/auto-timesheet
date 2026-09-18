@@ -76,6 +76,9 @@
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
+(defn get-category-to-use [input-category]
+  (or input-category (:default-category @config)))
+
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
 (defn clockin
@@ -86,7 +89,7 @@
   this check is overrided. `time` is the effective time. If not specified, it'll
   be the current time."
   [{{:keys [category force time]} :opts}]
-  (let [category-to-use (or category (:default-category @config))
+  (let [category-to-use (get-category-to-use category)
         effective-datetime (get-effective-datetime time)]
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
