@@ -106,15 +106,17 @@
 (defn manual-entry
   "Manually create a clock in, and clock out in one go by specifying the times for
   clock in, and clock out."
-  [db clockin-time clockout-time category]
-  (let [category-id (category-to-id db category)
-        ;; TODO: At the moment this assumes that clockin-time, and clockout-time
-        ;; are both times without dates but this may not always be the case.
-        clockin-starttime (full-date clockin-time)
-        clockout-stoptime (full-date clockout-time)]
-    (as-db/manual-clock-in db {:starttime (to-epoch clockin-starttime)
-                               :category-id category-id
-                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime (to-epoch clockout-stoptime)}))})))
+  ([db clockin-time clockout-time category]
+   (let [category-id (category-to-id db category)
+         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
+         ;; are both times without dates but this may not always be the case.
+         clockin-starttime (full-date clockin-time)
+         clockout-stoptime (full-date clockout-time)]
+     (as-db/manual-clock-in db {:starttime (to-epoch clockin-starttime)
+                                :category-id category-id
+                                :clockoutid (:clockoutid (as-db/clock-out db {:stoptime (to-epoch clockout-stoptime)}))})))
+  ([db time-range category]
+   (manual-entry db (:start-date-time time-range) (:end-date-time time-range) category)))
 
 (defn delete-clocks
   "Delete all clock ins, and clock outs which lie within `period-start`, and `period-end`."
