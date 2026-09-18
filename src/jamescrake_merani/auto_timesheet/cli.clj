@@ -77,7 +77,9 @@
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
 (defn get-category-to-use [input-category]
-  (or input-category (:default-category @config)))
+  (let [proposed-category (or input-category (:default-category @config))]
+    (if (nil? proposed-category)
+      (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config."))))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
@@ -94,7 +96,6 @@
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
       ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
-      (nil? category-to-use) (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config.")
       :else (do
               (helpers/clock-in @db category-to-use effective-datetime)
               (println "Clocked in.")))))
