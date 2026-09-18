@@ -173,7 +173,9 @@
               :require true
               :desc "The end time of this range."}
    :date {:alias :d
-          :desc "The date of both the start, and end time."}})
+          :desc "The date of the start time."}
+   :end-date-offset {:alias :o
+                     :desc "The amount of days to add onto the start date for the end date."}})
 
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command
