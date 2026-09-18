@@ -79,7 +79,8 @@
 (defn get-category-to-use [input-category]
   (let [proposed-category (or input-category (:default-category @config))]
     (if (nil? proposed-category)
-      (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config."))))
+      (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config.")
+      proposed-category)))
 
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
