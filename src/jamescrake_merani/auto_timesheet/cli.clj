@@ -189,14 +189,12 @@
 (defn delete-range-command
   "Prompt the user to delete all clocks within a specified time range."
   [{{:keys [start-time end-time date end-date-offset]} :opts}]
-  (let [period-date (if (nil? date) (LocalDate/now) (LocalDate/parse date))
-        period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
-        period-end (LocalDateTime/of (parse-date-offset period-date end-date-offset) (LocalTime/parse end-time))
+  (let [time-range (parse-range start-time end-time date end-date-offset)
         to-remove
         (helpers/clocks-within-timeperiod
          @db
-         period-start
-         period-end)]
+         (:start-date-time time-range)
+         (:end-date-time time-range))]
     (if (empty? to-remove)
       (error-and-quit "No clocks were found in the period you specified.")
       (do
@@ -204,7 +202,7 @@
         (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
         (if (= (str/trim (read-line)) "y")
           (do
-            (helpers/delete-clocks @db period-start period-end)
+            (helpers/delete-clocks @db time-range)
             (println "Deleted."))
           (println "Cancelled."))))))
 
