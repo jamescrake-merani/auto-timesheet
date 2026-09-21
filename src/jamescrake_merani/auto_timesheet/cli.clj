@@ -79,6 +79,7 @@
 (defn get-category-to-use [input-category]
   (let [proposed-category (or input-category (:default-category @config))]
     (if (nil? proposed-category)
+      ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
       (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config.")
       proposed-category)))
 
@@ -96,7 +97,6 @@
         effective-datetime (get-effective-datetime time)]
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
-      ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
       :else (do
               (helpers/clock-in @db category-to-use effective-datetime)
               (println "Clocked in.")))))
