@@ -180,10 +180,11 @@
    :date {:alias :d
           :desc "The date of the start time."}
    :end-date-offset {:alias :o
+                     :coerce :long
                      :desc "The amount of days to add onto the start date for the end date."}})
 
-(defn parse-date-offset [start-date offset-str]
-  (.plusDays ^LocalDate start-date (if offset-str (parse-long offset-str) 0)))
+(defn parse-date-offset [start-date offset]
+  (.plusDays ^LocalDate start-date (or offset 0)))
 
 (defn parse-range [start-time end-time date-str end-date-offset]
   (let [date (if (nil? date-str) (LocalDate/now) (LocalDate/parse date-str))]
