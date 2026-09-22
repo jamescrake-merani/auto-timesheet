@@ -197,7 +197,6 @@
     (helpers/->TimeRange (LocalDateTime/of date (LocalTime/parse start-time))
                          (LocalDateTime/of (handle-date-offset date end-date-offset) (LocalTime/parse end-time)))))
 
-;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command
   "Prompt the user to delete all clocks within a specified time range."
   [{{:keys [start-time end-time date end-date-offset]} :opts}]
