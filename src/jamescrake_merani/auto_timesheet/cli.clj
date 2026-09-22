@@ -197,10 +197,7 @@
   [{{:keys [start-time end-time date end-date-offset]} :opts}]
   (let [time-range (parse-range start-time end-time date end-date-offset)
         to-remove
-        (helpers/clocks-within-timeperiod
-         @db
-         (:start-date-time time-range)
-         (:end-date-time time-range))]
+        (helpers/clocks-within-timeperiod @db time-range)]
     (if (empty? to-remove)
       (error-and-quit "No clocks were found in the period you specified.")
       (do

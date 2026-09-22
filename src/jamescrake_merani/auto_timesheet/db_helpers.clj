@@ -130,6 +130,8 @@
   "Return all the clocks that fall within `period-start`, and `period-end`."
   ([db period-start period-end]
    (clocks-within-timeperiod db period-start period-end true))
+  ([db time-range]
+   (clocks-within-timeperiod db (:start-date-time time-range) (:end-date-time time-range)))
   ([db period-start period-end use-starttime?]
    (map convert-clock
         (as-db/clocks-within-timeperiod
