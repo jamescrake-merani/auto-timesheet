@@ -76,7 +76,10 @@
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
-(defn get-category-to-use [input-category]
+(defn get-category-to-use
+  "Takes in an `input-category` (which may be nil), and outputs the one to use,
+  which could be the default specified in the config."
+  [input-category]
   (let [proposed-category (or input-category (:default-category @config))]
     (if (nil? proposed-category)
       ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
@@ -183,7 +186,10 @@
                      :coerce :long
                      :desc "The amount of days to add onto the start date for the end date."}})
 
-(defn handle-date-offset [start-date offset]
+(defn handle-date-offset
+  "Given `offset` (which may be nil), add that many days onto the start date, or 0
+  if one is not provided."
+  [start-date offset]
   (.plusDays ^LocalDate start-date (or offset 0)))
 
 (defn parse-range [start-time end-time date-str end-date-offset]
