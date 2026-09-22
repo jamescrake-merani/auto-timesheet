@@ -183,13 +183,13 @@
                      :coerce :long
                      :desc "The amount of days to add onto the start date for the end date."}})
 
-(defn parse-date-offset [start-date offset]
+(defn handle-date-offset [start-date offset]
   (.plusDays ^LocalDate start-date (or offset 0)))
 
 (defn parse-range [start-time end-time date-str end-date-offset]
   (let [date (if (nil? date-str) (LocalDate/now) (LocalDate/parse date-str))]
     (helpers/->TimeRange (LocalDateTime/of date (LocalTime/parse start-time))
-                         (LocalDateTime/of (parse-date-offset date end-date-offset) (LocalTime/parse end-time)))))
+                         (LocalDateTime/of (handle-date-offset date end-date-offset) (LocalTime/parse end-time)))))
 
 ;; TODO: Right now this only works for today. Possibly specify a date as well.
 (defn delete-range-command
