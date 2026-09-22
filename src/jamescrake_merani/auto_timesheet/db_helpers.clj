@@ -108,8 +108,6 @@
   clock in, and clock out."
   ([db clockin-time clockout-time category]
    (let [category-id (category-to-id db category)
-         ;; TODO: At the moment this assumes that clockin-time, and clockout-time
-         ;; are both times without dates but this may not always be the case.
          clockin-starttime (full-date clockin-time)
          clockout-stoptime (full-date clockout-time)]
      (as-db/manual-clock-in db {:starttime (to-epoch clockin-starttime)
