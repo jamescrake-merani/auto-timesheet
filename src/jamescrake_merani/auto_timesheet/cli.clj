@@ -76,6 +76,16 @@
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
+(defn get-category-to-use
+  "Takes in an `input-category` (which may be nil), and outputs the one to use,
+  which could be the default specified in the config."
+  [input-category]
+  (let [proposed-category (or input-category (:default-category @config))]
+    (if (nil? proposed-category)
+      ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
+      (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config.")
+      proposed-category)))
+
 ;: TODO Allow the user to disable this check.
 ;; TODO: Also this check only looks for all categories not one specific one.
 (defn clockin
@@ -86,12 +96,10 @@
   this check is overrided. `time` is the effective time. If not specified, it'll
   be the current time."
   [{{:keys [category force time]} :opts}]
-  (let [category-to-use (or category (:default-category @config))
+  (let [category-to-use (get-category-to-use category)
         effective-datetime (get-effective-datetime time)]
     (cond
       (not (or (empty? (helpers/hanging-clockins @db)) force)) (println "You are already clocked in. (use the --force flag to ignore this check.)")
-      ;; TODO: Probably want to explain a bit better how to add a default one - perhaps link to documentation when thats available?
-      (nil? category-to-use) (error-and-quit "You need to provide a category with clock ins as you haven't provided a default one in your config.")
       :else (do
               (helpers/clock-in @db category-to-use effective-datetime)
               (println "Clocked in.")))))
@@ -173,20 +181,28 @@
               :require true
               :desc "The end time of this range."}
    :date {:alias :d
-          :desc "The date of both the start, and end time."}})
+          :desc "The date of the start time."}
+   :end-date-offset {:alias :o
+                     :coerce :long
+                     :desc "The amount of days to add onto the start date for the end date."}})
 
-;; TODO: Right now this only works for today. Possibly specify a date as well.
+(defn handle-date-offset
+  "Given `offset` (which may be nil), add that many days onto the start date, or 0
+  if one is not provided."
+  [start-date offset]
+  (.plusDays ^LocalDate start-date (or offset 0)))
+
+(defn parse-range [start-time end-time date-str end-date-offset]
+  (let [date (if (nil? date-str) (LocalDate/now) (LocalDate/parse date-str))]
+    (helpers/->TimeRange (LocalDateTime/of date (LocalTime/parse start-time))
+                         (LocalDateTime/of (handle-date-offset date end-date-offset) (LocalTime/parse end-time)))))
+
 (defn delete-range-command
   "Prompt the user to delete all clocks within a specified time range."
-  [{{:keys [start-time end-time date]} :opts}]
-  (let [period-date (if (nil? date) (LocalDate/now) (LocalDate/parse date))
-        period-start (LocalDateTime/of period-date (LocalTime/parse start-time))
-        period-end (LocalDateTime/of period-date (LocalTime/parse end-time))
+  [{{:keys [start-time end-time date end-date-offset]} :opts}]
+  (let [time-range (parse-range start-time end-time date end-date-offset)
         to-remove
-        (helpers/clocks-within-timeperiod
-         @db
-         period-start
-         period-end)]
+        (helpers/clocks-within-timeperiod @db time-range)]
     (if (empty? to-remove)
       (error-and-quit "No clocks were found in the period you specified.")
       (do
@@ -194,7 +210,7 @@
         (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
         (if (= (str/trim (read-line)) "y")
           (do
-            (helpers/delete-clocks @db period-start period-end)
+            (helpers/delete-clocks @db time-range)
             (println "Deleted."))
           (println "Cancelled."))))))
 
@@ -217,18 +233,13 @@
 
 (def manual-entry-spec
   (assoc range-spec :category {:alias :c
-                               :require true
                                :desc "The category of this manual entry."}))
 
 (defn manual-entry
   "Create a manual entry from values parsed from strings."
-  [{{:keys [start-time end-time date category]} :opts}]
-  (let [start-local-time (LocalTime/parse start-time)
-        end-local-time (LocalTime/parse end-time)
-        local-date (if date (LocalDate/parse date))]
-    (if local-date
-      (helpers/manual-entry @db (LocalDateTime/of local-date start-local-time) (LocalDateTime/of local-date end-local-time) category)
-      (helpers/manual-entry @db start-local-time end-local-time category))))
+  [{{:keys [start-time end-time date end-date-offset category]} :opts}]
+  (let [time-range (parse-range start-time end-time date end-date-offset)]
+    (helpers/manual-entry @db time-range (get-category-to-use category))))
 
 (defn directories
   "Print out the directories as fetched by ProjectDirectories"

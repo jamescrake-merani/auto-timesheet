@@ -25,6 +25,8 @@
                       ZoneOffset)
            (java.time.temporal ChronoUnit)))
 
+(defrecord TimeRange [start-date-time end-date-time])
+
 (defn- to-epoch
   "Converts `ldt` to seconds since the UTC epoch."
   [^LocalDateTime ldt]
@@ -104,27 +106,32 @@
 (defn manual-entry
   "Manually create a clock in, and clock out in one go by specifying the times for
   clock in, and clock out."
-  [db clockin-time clockout-time category]
-  (let [category-id (category-to-id db category)
-        ;; TODO: At the moment this assumes that clockin-time, and clockout-time
-        ;; are both times without dates but this may not always be the case.
-        clockin-starttime (full-date clockin-time)
-        clockout-stoptime (full-date clockout-time)]
-    (as-db/manual-clock-in db {:starttime (to-epoch clockin-starttime)
-                               :category-id category-id
-                               :clockoutid (:clockoutid (as-db/clock-out db {:stoptime (to-epoch clockout-stoptime)}))})))
+  ([db clockin-time clockout-time category]
+   (let [category-id (category-to-id db category)
+         clockin-starttime (full-date clockin-time)
+         clockout-stoptime (full-date clockout-time)]
+     (as-db/manual-clock-in db {:starttime (to-epoch clockin-starttime)
+                                :category-id category-id
+                                :clockoutid (:clockoutid (as-db/clock-out db {:stoptime (to-epoch clockout-stoptime)}))})))
+  ([db time-range category]
+   (manual-entry db (:start-date-time time-range) (:end-date-time time-range) category)))
 
 (defn delete-clocks
   "Delete all clock ins, and clock outs which lie within `period-start`, and `period-end`."
-  [db period-start period-end]
-  (as-db/delete-clockouts-within-timeperiod db {:periodstart (to-epoch period-start)
-                                                :periodend (to-epoch period-end)})
-  (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
-                                               :periodend (to-epoch period-end)}))
+  ([db period-start period-end]
+   (as-db/delete-clockouts-within-timeperiod db {:periodstart (to-epoch period-start)
+                                                 :periodend (to-epoch period-end)})
+   (as-db/delete-clockins-within-timeperiod db {:periodstart (to-epoch period-start)
+                                                :periodend (to-epoch period-end)}))
+  ([db time-range]
+   (delete-clocks db (:start-date-time time-range) (:end-date-time time-range))))
+
 (defn clocks-within-timeperiod
   "Return all the clocks that fall within `period-start`, and `period-end`."
   ([db period-start period-end]
    (clocks-within-timeperiod db period-start period-end true))
+  ([db time-range]
+   (clocks-within-timeperiod db (:start-date-time time-range) (:end-date-time time-range)))
   ([db period-start period-end use-starttime?]
    (map convert-clock
         (as-db/clocks-within-timeperiod
