@@ -30,7 +30,7 @@
    :sql-directory (io/file (.dataDir ^ProjectDirectories @directories) "data.db")
    :default-report "human-readable"})
 
-(defn get-config-path
+(defn ^java.io.File get-config-path
   "Get the path that the config is expected to live in."
   []
   (io/file (.configDir ^ProjectDirectories @directories) "config.edn"))
