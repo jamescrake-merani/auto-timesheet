@@ -42,7 +42,8 @@
 (def db (delay (open-database (:sql-directory @config))))
 
 (defn init-config
-  "Initialise the config in the location with default values."
+  "Initialise the config at the location it should be given the user's platform
+  with default values."
   [_]
   (let [config-path (configuration/get-config-path)]
     (when (.exists ^java.io.File config-path)
