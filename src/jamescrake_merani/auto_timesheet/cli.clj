@@ -50,6 +50,7 @@
       (when (not (= (str/trim (read-line)) "y"))
         (println "Aborted.")
         (System/exit 0)))
+    (io/make-parents config-path)
     (spit config-path (configuration/make-default-config))
     (println (format "Config initialised in %s" config-path))))
 
