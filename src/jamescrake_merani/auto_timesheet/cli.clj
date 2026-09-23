@@ -289,7 +289,8 @@
   (println "Clock amended."))
 
 (def table
-  [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
+  [{:cmds ["init-config"] :fn init-config :doc "Initalise the default configuration"}
+   {:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["reports-available"] :fn print-reports-available :doc "Shows all the reports that are available in this build."}
