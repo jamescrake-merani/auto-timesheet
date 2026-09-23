@@ -47,8 +47,9 @@
   (let [config-path (configuration/get-config-path)]
     (if (not (.exists ^java.io.File config-path))
       (println "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed? (y/N)")
-      (if (not (= (str/trim (read-line)) "y"))
-        (println "Aborted.")))
+      (when (not (= (str/trim (read-line)) "y"))
+        (println "Aborted.")
+        (System/exit 0)))
     (spit config-path (configuration/make-default-config))
     (println (format "Config initialised in %s" config-path))))
 
