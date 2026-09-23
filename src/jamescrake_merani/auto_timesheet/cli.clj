@@ -37,6 +37,12 @@
     (.println ^java.io.PrintWriter *err* error-message)
     (System/exit 1)))
 
+(defn- confirm?
+  "Print the prompt and return true if the user answers yes."
+  [prompt]
+  (println prompt)
+  (= (str/trim (read-line)) "y"))
+
 (def config (delay (configuration/load-config)))
 ;; TODO: I'm not sure whether this should be at this level.
 (def db (delay (open-database (:sql-directory @config))))
@@ -47,8 +53,7 @@
   [_]
   (let [config-path (configuration/get-config-path)]
     (when (.exists ^java.io.File config-path)
-      (println "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed? (y/N)")
-      (when-not (= (str/trim (read-line)) "y")
+      (when-not (confirm? "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed? (y/N)")
         (error-and-quit "Aborted.")))
     (io/make-parents config-path)
     (spit config-path (with-out-str (pprint (configuration/make-default-config))))
@@ -221,8 +226,7 @@
       (error-and-quit "No clocks were found in the period you specified.")
       (do
         (print-clocks to-remove)
-        (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
-        (if (= (str/trim (read-line)) "y")
+        (if (confirm? "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
           (do
             (helpers/delete-clocks @db time-range)
             (println "Deleted."))
