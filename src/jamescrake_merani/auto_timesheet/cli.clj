@@ -40,6 +40,12 @@
 ;; TODO: I'm not sure whether this should be at this level.
 (def db (delay (open-database (:sql-directory @config))))
 
+(defn init-config
+  "Initialise the config in the location with default values."
+  [_]
+  ;; TODO: Prompt user if it already exists
+  (spit (configuration/get-config-path) (configuration/make-default-config)))
+
 (def clock-spec
   {:category {:alias :c
               :desc "The category to clock into. This only needs to be specified if you don't have a default category in your config."}
