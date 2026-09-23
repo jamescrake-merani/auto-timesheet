@@ -43,7 +43,6 @@
 (defn init-config
   "Initialise the config in the location with default values."
   [_]
-  ;; TODO: Prompt user if it already exists
   (let [config-path (configuration/get-config-path)]
     (when (.exists ^java.io.File config-path)
       (println "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed? (y/N)")
