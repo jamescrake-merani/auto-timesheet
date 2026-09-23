@@ -19,6 +19,7 @@
             [jamescrake-merani.auto-timesheet.db-init :refer [open-database]]
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io]
+            [clojure.pprint :refer [pprint]]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
             [jamescrake-merani.auto-timesheet.reports :refer [reports-available format-duration]]
             [jamescrake-merani.auto-timesheet.config :as configuration]
@@ -36,9 +37,27 @@
     (.println ^java.io.PrintWriter *err* error-message)
     (System/exit 1)))
 
+(defn- confirm?
+  "Print the prompt with a (y/N) suffix and return true if the user answers yes."
+  [prompt]
+  (println (format "%s (y/N)" prompt))
+  (= (str/trim (read-line)) "y"))
+
 (def config (delay (configuration/load-config)))
 ;; TODO: I'm not sure whether this should be at this level.
 (def db (delay (open-database (:sql-directory @config))))
+
+(defn init-config
+  "Initialise the config at the location it should be given the user's platform
+  with default values."
+  [_]
+  (let [config-path (configuration/get-config-path)]
+    (when (.exists ^java.io.File config-path)
+      (when-not (confirm? "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed?")
+        (error-and-quit "Aborted.")))
+    (io/make-parents config-path)
+    (spit config-path (with-out-str (pprint (configuration/make-default-config))))
+    (println (format "Config initialised in %s" config-path))))
 
 (def clock-spec
   {:category {:alias :c
@@ -207,8 +226,7 @@
       (error-and-quit "No clocks were found in the period you specified.")
       (do
         (print-clocks to-remove)
-        (println "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
-        (if (= (str/trim (read-line)) "y")
+        (if (confirm? "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue?")
           (do
             (helpers/delete-clocks @db time-range)
             (println "Deleted."))
@@ -283,7 +301,8 @@
   (println "Clock amended."))
 
 (def table
-  [{:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
+  [{:cmds ["init-config"] :fn init-config :doc "Initialise the default configuration."}
+   {:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
    {:cmds ["clockout"] :fn clockout :doc "Make a clock out." :spec clock-spec}
    {:cmds ["report"] :fn report :doc "Display reports" :spec report-spec}
    {:cmds ["reports-available"] :fn print-reports-available :doc "Shows all the reports that are available in this build."}
