@@ -44,7 +44,9 @@
   "Initialise the config in the location with default values."
   [_]
   ;; TODO: Prompt user if it already exists
-  (spit (configuration/get-config-path) (configuration/make-default-config)))
+  (let [config-path (configuration/get-config-path)]
+    (spit config-path (configuration/make-default-config))
+    (println (format "Config initialised in ~s" config-path))))
 
 (def clock-spec
   {:category {:alias :c
