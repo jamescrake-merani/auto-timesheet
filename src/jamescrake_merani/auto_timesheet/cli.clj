@@ -19,6 +19,7 @@
             [jamescrake-merani.auto-timesheet.db-init :refer [open-database]]
             [jamescrake-merani.auto-timesheet.db :as as-db]
             [clojure.java.io :as io]
+            [clojure.pprint :refer [pprint]]
             [jamescrake-merani.auto-timesheet.db-helpers :as helpers]
             [jamescrake-merani.auto-timesheet.reports :refer [reports-available format-duration]]
             [jamescrake-merani.auto-timesheet.config :as configuration]
@@ -50,7 +51,7 @@
         (println "Aborted.")
         (System/exit 0)))
     (io/make-parents config-path)
-    (spit config-path (configuration/make-default-config))
+    (spit config-path (with-out-str (pprint (configuration/make-default-config))))
     (println (format "Config initialised in %s" config-path))))
 
 (def clock-spec
