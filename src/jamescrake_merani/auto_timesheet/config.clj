@@ -27,7 +27,7 @@
   depends on the platform."
   []
   {:default-category nil
-   :sql-directory (io/file (.dataDir ^ProjectDirectories @directories) "data.db")
+   :sql-directory (str (io/file (.dataDir ^ProjectDirectories @directories) "data.db"))
    :default-report "human-readable"})
 
 (defn ^java.io.File get-config-path
