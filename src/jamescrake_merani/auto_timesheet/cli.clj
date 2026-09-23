@@ -38,9 +38,9 @@
     (System/exit 1)))
 
 (defn- confirm?
-  "Print the prompt and return true if the user answers yes."
+  "Print the prompt with a (y/N) suffix and return true if the user answers yes."
   [prompt]
-  (println prompt)
+  (println (format "%s (y/N)" prompt))
   (= (str/trim (read-line)) "y"))
 
 (def config (delay (configuration/load-config)))
@@ -53,7 +53,7 @@
   [_]
   (let [config-path (configuration/get-config-path)]
     (when (.exists ^java.io.File config-path)
-      (when-not (confirm? "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed? (y/N)")
+      (when-not (confirm? "A config file already exists. This command will overwrite that file with default configuration values. Are you sure you want to proceed?")
         (error-and-quit "Aborted.")))
     (io/make-parents config-path)
     (spit config-path (with-out-str (pprint (configuration/make-default-config))))
@@ -226,7 +226,7 @@
       (error-and-quit "No clocks were found in the period you specified.")
       (do
         (print-clocks to-remove)
-        (if (confirm? "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue? (y/N)")
+        (if (confirm? "These clocks will all be PERMANENTLY deleted. Are you sure you wish to continue?")
           (do
             (helpers/delete-clocks @db time-range)
             (println "Deleted."))
