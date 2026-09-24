@@ -27,6 +27,16 @@
 
 (defrecord TimeRange [start-date-time end-date-time])
 
+(defn format-date-range [date1 date2]
+  (if (= date1 date2)
+    (.toString date1)
+    (format "~s - ~s" (.toString date1) (.toString date2))))
+
+(defn format-time-range [range]
+  (format "~s - ~s | (~s)"
+          (-> (:start-date-time range) .toLocalTime .toString)
+          (-> (:end-date-time range) .toLocalTime .toString)))
+
 (defn- to-epoch
   "Converts `ldt` to seconds since the UTC epoch."
   [^LocalDateTime ldt]
