@@ -270,7 +270,7 @@
 (defn valid-in-or-out?
   "Check that `value` is the string literal in, or out."
   [value]
-  (contains? {"in" "out"} value))
+  (contains? #{"in" "out"} value))
 
 (def amend-spec
   {:in-or-out {:alias :i
