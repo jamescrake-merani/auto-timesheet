@@ -35,7 +35,10 @@
 (defn format-time-range [range]
   (format "~s - ~s | (~s)"
           (-> (:start-date-time range) .toLocalTime .toString)
-          (-> (:end-date-time range) .toLocalTime .toString)))
+          (-> (:end-date-time range) .toLocalTime .toString)
+          (format-date-range
+           (.localDate (:start-date-time range))
+           (.toLocalDate (:end-date-time range)))))
 
 (defn- to-epoch
   "Converts `ldt` to seconds since the UTC epoch."
