@@ -30,10 +30,10 @@
 (defn format-date-range [date1 date2]
   (if (= date1 date2)
     (.toString date1)
-    (format "~s - ~s" (.toString date1) (.toString date2))))
+    (format "%s - %s" (.toString date1) (.toString date2))))
 
 (defn format-time-range [range]
-  (format "~s - ~s | (~s)"
+  (format "%s - %s | (%s)"
           (-> (:start-date-time range) .toLocalTime .toString)
           (-> (:end-date-time range) .toLocalTime .toString)
           (format-date-range
