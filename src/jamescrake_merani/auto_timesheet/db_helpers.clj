@@ -37,7 +37,7 @@
           (-> (:start-date-time range) .toLocalTime .toString)
           (-> (:end-date-time range) .toLocalTime .toString)
           (format-date-range
-           (.localDate (:start-date-time range))
+           (.toLocalDate (:start-date-time range))
            (.toLocalDate (:end-date-time range)))))
 
 (defn- to-epoch
