@@ -27,6 +27,25 @@
 
 (defrecord TimeRange [start-date-time end-date-time])
 
+(defn format-date-range
+  "Create a human readable range string for the dates. It'll just show one data if
+  `date1` matches `date2`, but otherwise it'll show a range between the two."
+  [^LocalDate date1 ^LocalDate date2]
+  (if (= date1 date2)
+    (.toString date1)
+    (format "%s - %s" date1 date2)))
+
+(defn format-time-time-range
+  "Create a human readable string to represent `time-range` (a TimeRange)."
+  [time-range]
+  (let [^LocalDateTime start (:start-date-time time-range)
+        ^LocalDateTime end   (:end-date-time time-range)]
+    (format "%s - %s | (%s)"
+            (.toString (.toLocalTime start))
+            (.toString (.toLocalTime end))
+            (format-date-range (.toLocalDate start)
+                               (.toLocalDate end)))))
+
 (defn- to-epoch
   "Converts `ldt` to seconds since the UTC epoch."
   [^LocalDateTime ldt]

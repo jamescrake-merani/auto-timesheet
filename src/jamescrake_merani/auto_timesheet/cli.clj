@@ -257,7 +257,13 @@
   "Create a manual entry from values parsed from strings."
   [{{:keys [start-time end-time date end-date-offset category]} :opts}]
   (let [time-range (parse-range start-time end-time date end-date-offset)]
-    (helpers/manual-entry @db time-range (get-category-to-use category))))
+    (if (confirm? (format "You are about to create the clock: %s with category ~s. Are you sure you wish to continue?"
+                          (helpers/format-time-range time-range)
+                          (get-category-to-use category)))
+      (do
+        (helpers/manual-entry @db time-range (get-category-to-use category))
+        (println "Created."))
+      (error-and-quit "Aborted."))))
 
 (defn directories
   "Print out the directories as fetched by ProjectDirectories"
