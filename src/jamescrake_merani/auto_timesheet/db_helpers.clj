@@ -15,7 +15,8 @@
 ;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 (ns jamescrake-merani.auto-timesheet.db-helpers
-  (:require [jamescrake-merani.auto-timesheet.db :as as-db])
+  (:require [jamescrake-merani.auto-timesheet.db :as as-db]
+            [clojure.set :as s])
   (:import (java.time LocalDateTime
                       LocalDate
                       LocalTime
@@ -223,3 +224,14 @@
                                     (:stoptime %2)))
           Duration/ZERO clocks))
 
+(defn get-grouped-categories
+  "Gets the categories, and groups them into a map with two keys: (`:used`, and
+  `unused`). Unused categories are categories that exist in the database but
+  have never actually been added to a clock. The user can't manually create
+  categories (they get created automatically on a clock) so this shouldn't
+  happen unless the user deleted a clock."
+  [db]
+  (let [all-categories (set (map :name (as-db/get-all-categories db)))
+        used-categories (set (map :name (as-db/get-used-categories db)))]
+    {:used used-categories
+     :unused (s/difference all-categories used-categories)}))
