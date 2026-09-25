@@ -306,6 +306,17 @@
      (LocalDateTime/of date-to-use (LocalTime/parse new-time))))
   (println "Clock amended."))
 
+(defn show-all-categories
+  "Show to the user all the categories"
+  [_]
+  (let [{:keys [used-categories :used
+                unused-categories :unused]} (helpers/get-grouped-categories db)]
+    (println "Categories used in the database:")
+    (doseq [c used-categories] (println "-" used-categories))
+    (when unused-categories
+      (println "Catrgories that exist in the database but aren't used for clockins:")
+      (doseq [c unused-categories] (println "-" unused-categories)))))
+
 (def table
   [{:cmds ["init-config"] :fn init-config :doc "Initialise the default configuration."}
    {:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
@@ -317,6 +328,7 @@
    {:cmds ["manual-entry"] :fn manual-entry :spec manual-entry-spec :doc "Manually make a clock in, and clock out."}
    {:cmds ["directories"] :fn directories :doc "Show the directories of where the config, and database is stored."}
    {:cmds ["amend"] :fn amend :doc "Make an amendment to an existing clock in/out." :spec amend-spec}
+   {:cmds ["all-categories" :fn show-all-categories :doc "Show all of the categories in the database."]}
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
