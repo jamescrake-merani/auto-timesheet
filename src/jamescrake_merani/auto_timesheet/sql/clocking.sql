@@ -140,3 +140,9 @@ where :id = categoryid;
 insert into category (name)
 values (:name)
 returning categoryid;
+
+-- :name get-all-categories
+-- :command :execute
+-- :result many
+select name from category;
+
