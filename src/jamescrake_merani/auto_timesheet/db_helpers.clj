@@ -33,7 +33,7 @@
   [^LocalDate date1 ^LocalDate date2]
   (if (= date1 date2)
     (.toString date1)
-    (format "%s - %s" (.toString date1) (.toString date2))))
+    (format "%s - %s" date1 date2)))
 
 (defn format-time-time-range
   "Create a human readable string to represent `time-range` (a TimeRange)."
