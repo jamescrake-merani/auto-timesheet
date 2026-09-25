@@ -257,8 +257,9 @@
   "Create a manual entry from values parsed from strings."
   [{{:keys [start-time end-time date end-date-offset category]} :opts}]
   (let [time-range (parse-range start-time end-time date end-date-offset)]
-    (if (confirm? (format "You are about to create the clock: %s. Are you sure you wish to continue?"
-                          (helpers/format-time-range time-range)))
+    (if (confirm? (format "You are about to create the clock: %s with category ~s. Are you sure you wish to continue?"
+                          (helpers/format-time-range time-range)
+                          (get-category-to-use category)))
       (do
         (helpers/manual-entry @db time-range (get-category-to-use category))
         (println "Created."))
