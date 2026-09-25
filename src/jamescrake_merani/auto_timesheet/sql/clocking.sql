@@ -146,3 +146,9 @@ returning categoryid;
 -- :result many
 select name from category;
 
+-- :name get-used-categories
+-- :command :execute
+-- :result :many
+select distinct c.name from category as c
+join clockin as i on i.categoryid = c.categoryid;
+
