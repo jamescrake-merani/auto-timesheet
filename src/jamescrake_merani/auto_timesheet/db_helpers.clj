@@ -27,18 +27,19 @@
 
 (defrecord TimeRange [start-date-time end-date-time])
 
-(defn format-date-range [date1 date2]
+(defn format-date-range [^LocalDate date1 ^LocalDate date2]
   (if (= date1 date2)
     (.toString date1)
     (format "%s - %s" (.toString date1) (.toString date2))))
 
 (defn format-time-range [range]
-  (format "%s - %s | (%s)"
-          (-> (:start-date-time range) .toLocalTime .toString)
-          (-> (:end-date-time range) .toLocalTime .toString)
-          (format-date-range
-           (.toLocalDate (:start-date-time range))
-           (.toLocalDate (:end-date-time range)))))
+  (let [^LocalDateTime start (:start-date-time range)
+        ^LocalDateTime end   (:end-date-time range)]
+    (format "%s - %s | (%s)"
+            (.toString (.toLocalTime start))
+            (.toString (.toLocalTime end))
+            (format-date-range (.toLocalDate start)
+                               (.toLocalDate end)))))
 
 (defn- to-epoch
   "Converts `ldt` to seconds since the UTC epoch."
