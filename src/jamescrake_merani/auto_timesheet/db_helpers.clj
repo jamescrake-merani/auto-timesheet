@@ -35,7 +35,7 @@
     (.toString date1)
     (format "%s - %s" date1 date2)))
 
-(defn format-time-time-range
+(defn format-time-range
   "Create a human readable string to represent `time-range` (a TimeRange)."
   [time-range]
   (let [^LocalDateTime start (:start-date-time time-range)
