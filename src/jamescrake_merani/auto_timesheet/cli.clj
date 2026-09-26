@@ -313,7 +313,7 @@
          unused-categories :unused} (helpers/get-grouped-categories @db)]
     (println "Categories used in the database:")
     (doseq [c used-categories] (println "-" used-categories))
-    (when unused-categories
+    (when (not-empty unused-categories)
       (println "Catrgories that exist in the database but aren't used for clockins:")
       (doseq [c unused-categories] (println "-" unused-categories)))))
 
