@@ -143,7 +143,7 @@ returning categoryid;
 
 -- :name get-all-categories
 -- :command :execute
--- :result many
+-- :result :many
 select name from category;
 
 -- :name get-used-categories
