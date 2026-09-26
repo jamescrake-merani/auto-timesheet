@@ -310,7 +310,7 @@
   "Show to the user all the categories"
   [_]
   (let [{:keys [used-categories :used
-                unused-categories :unused]} (helpers/get-grouped-categories db)]
+                unused-categories :unused]} (helpers/get-grouped-categories @db)]
     (println "Categories used in the database:")
     (doseq [c used-categories] (println "-" used-categories))
     (when unused-categories
