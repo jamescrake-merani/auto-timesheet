@@ -212,3 +212,10 @@
      (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
        (t/is (= (frequencies (:clocks-now datum))
                 (frequencies new-clocks)))))))
+
+(t/deftest show-category-test
+  (t/testing "Empty db"
+    (let [db (make-db)]
+      (t/is {:used #{}
+             :unused #{}}
+            (sut/get-grouped-categories db)))))
