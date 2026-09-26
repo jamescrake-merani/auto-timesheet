@@ -226,7 +226,7 @@
 
 (defn get-grouped-categories
   "Gets the categories, and groups them into a map with two keys: (`:used`, and
-  `unused`). Unused categories are categories that exist in the database but
+  `:unused`). Unused categories are categories that exist in the database but
   have never actually been added to a clock. The user can't manually create
   categories (they get created automatically on a clock) so this shouldn't
   happen unless the user deleted a clock."
