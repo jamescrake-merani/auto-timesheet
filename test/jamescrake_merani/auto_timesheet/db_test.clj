@@ -212,3 +212,51 @@
      (let [new-clocks (map #(vector (:starttime %) (:stoptime %)) (map sut/convert-clock (db-raw/all-clocks db)))]
        (t/is (= (frequencies (:clocks-now datum))
                 (frequencies new-clocks)))))))
+
+(t/deftest show-category-test
+  (t/testing "Empty db"
+    (let [db (make-db)]
+      (t/is (= {:used #{}
+                :unused #{}}
+               (sut/get-grouped-categories db)))))
+  (t/testing "One category used."
+    (let [db (make-db)]
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 8 00)
+                        (LocalDateTime/of 2026 6 11 12 00)
+                        "work")
+      (sut/manual-entry db (LocalDateTime/of 2026 6 12 9 00)
+                        (LocalDateTime/of 2026 6 12 15 00)
+                        "work")
+      (t/is (= {:used #{"work"}
+                :unused #{}}
+               (sut/get-grouped-categories db)))))
+  (t/testing "Three used categories, no unused categories."
+    (let [db (make-db)]
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 8 00)
+                        (LocalDateTime/of 2026 6 11 12 00)
+                        "work")
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 13 00)
+                        (LocalDateTime/of 2026 6 11 15 00)
+                        "hobby")
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 16 00)
+                        (LocalDateTime/of 2026 6 11 18 00)
+                        "consulting")
+      (t/is (= {:used #{"work" "hobby" "consulting"}
+                :unused #{}}
+               (sut/get-grouped-categories db)))))
+  (t/testing "Two used categories, one unused category."
+    (let [db (make-db)]
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 8 00)
+                        (LocalDateTime/of 2026 6 11 12 00)
+                        "work")
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 13 00)
+                        (LocalDateTime/of 2026 6 11 15 00)
+                        "volunteering")
+      (sut/manual-entry db (LocalDateTime/of 2026 6 11 16 00)
+                        (LocalDateTime/of 2026 6 11 18 00)
+                        "hobby")
+      (sut/delete-clocks db (LocalDateTime/of 2026 6 11 16 00)
+                         (LocalDateTime/of 2026 6 11 18 00))
+      (t/is (= {:used #{"work" "volunteering"}
+                :unused #{"hobby"}}
+               (sut/get-grouped-categories db))))))

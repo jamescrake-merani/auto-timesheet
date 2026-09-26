@@ -140,3 +140,15 @@ where :id = categoryid;
 insert into category (name)
 values (:name)
 returning categoryid;
+
+-- :name get-all-categories
+-- :command :execute
+-- :result :many
+select name from category;
+
+-- :name get-used-categories
+-- :command :execute
+-- :result :many
+select distinct c.name from category as c
+join clockin as i on i.categoryid = c.categoryid;
+
