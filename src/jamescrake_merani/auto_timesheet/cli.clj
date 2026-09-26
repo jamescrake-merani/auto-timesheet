@@ -314,7 +314,7 @@
     (println "Categories used in the database:")
     (doseq [c used-categories] (println "-" c))
     (when (not-empty unused-categories)
-      (println "Catrgories that exist in the database but aren't used for clockins:")
+      (println "Categories that exist in the database but aren't used in any clockins:")
       (doseq [c unused-categories] (println "-" c)))))
 
 (def table
