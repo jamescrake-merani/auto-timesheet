@@ -312,10 +312,10 @@
   (let [{used-categories :used
          unused-categories :unused} (helpers/get-grouped-categories @db)]
     (println "Categories used in the database:")
-    (doseq [c used-categories] (println "-" used-categories))
+    (doseq [c used-categories] (println "-" c))
     (when (not-empty unused-categories)
       (println "Catrgories that exist in the database but aren't used for clockins:")
-      (doseq [c unused-categories] (println "-" unused-categories)))))
+      (doseq [c unused-categories] (println "-" c)))))
 
 (def table
   [{:cmds ["init-config"] :fn init-config :doc "Initialise the default configuration."}
