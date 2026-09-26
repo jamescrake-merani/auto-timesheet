@@ -306,16 +306,25 @@
      (LocalDateTime/of date-to-use (LocalTime/parse new-time))))
   (println "Clock amended."))
 
+(defn- print-bullet-list
+  "Print a header followed by a bulleted list of items. Prints nothing when items is empty."
+  [header items]
+  (when (not-empty items)
+    (println header)
+    (doseq [item items]
+      (println "-" item))))
+
 (defn show-all-categories
   "Show to the user all the categories"
   [_]
   (let [{used-categories :used
          unused-categories :unused} (helpers/get-grouped-categories @db)]
-    (println "Categories used in the database:")
-    (doseq [c used-categories] (println "-" c))
-    (when (not-empty unused-categories)
-      (println "Categories that exist in the database but aren't used in any clockins:")
-      (doseq [c unused-categories] (println "-" c)))))
+    (if (and (empty? used-categories) (empty? unused-categories))
+      (println "There are no categories in the database.")
+      (do
+        (print-bullet-list "Categories used in the database:" used-categories)
+        (print-bullet-list "Categories that exist in the database but aren't used in any clockins:"
+                           unused-categories)))))
 
 (def table
   [{:cmds ["init-config"] :fn init-config :doc "Initialise the default configuration."}
