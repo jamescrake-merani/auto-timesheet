@@ -218,4 +218,14 @@
     (let [db (make-db)]
       (t/is {:used #{}
              :unused #{}}
-            (sut/get-grouped-categories db)))))
+            (sut/get-grouped-categories db))))
+  (t/testing "One category used."
+    (let [db (make-db)]
+      (sut/manual-entry (LocalDateTime/of 2026 6 11 8 00)
+                        (LocalDateTime/of 2026 6 11 12 00)
+                        "work")
+      (sut/manual-entry (LocalDateTime/of 2026 6 12 9 00)
+                        (LocalDateTime/of 2026 6 12 15 00)
+                        "work")
+      (t/is {:used #{"work"}
+             :unused #{}}))))
