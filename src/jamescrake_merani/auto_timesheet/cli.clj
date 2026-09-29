@@ -84,14 +84,22 @@
   (let [hanging-clockins (helpers/hanging-clockins @db)
         time-since-clockin (when (not (empty? hanging-clockins))
                              (:starttime (first hanging-clockins)))
-        effective-datetime (get-effective-datetime time)]
+        effective-datetime (get-effective-datetime time)
+        to-clock-out (helpers/clock-with-category hanging-clockins category)]
     (cond (empty? hanging-clockins)
           (error-and-quit "You are not clocked in.")
+          ;; This check is a bit early, but the reason its here is because if
+          ;; the user has specified a category but it turns out the only hanging
+          ;; clock in is not of that category then we shouldn't silently ignore
+          ;; the category because the user might get confused when we've clocked
+          ;; out of a clock in that wasn't of the category they specified.
+          (and category (nil? to-clock-out))
+          (error-and-quit "The category you've specified does not have a hanging clock in associated with it.")
           (= (count hanging-clockins) 1)
           (helpers/clock-out @db effective-datetime)
           (nil? category)
           (error-and-quit "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
-          :else (helpers/clock-out @db (helpers/clock-with-category hanging-clockins category) effective-datetime))
+          :else (helpers/clock-out @db to-clock-out effective-datetime))
     (println (format "Clocked out. You have worked %s"
                      (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
 
