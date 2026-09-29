@@ -209,6 +209,8 @@
   "Find the clock out (or clock-in if `clock-in?` is true) at `oldtime`, and replace it with `newtime`."
   [db clock-in? ^LocalDateTime oldtime ^LocalDateTime newtime]
   (let [to-amend (get-clock-at-time db oldtime clock-in?)]
+    (when (nil? to-amend)
+      (throw (ex-info "No clock found at that time." {})))
     (if clock-in?
       (as-db/amend-clockin db {:newstarttime (to-epoch newtime)
                                :clockinid (:clockinid to-amend)})
