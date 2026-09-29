@@ -299,11 +299,15 @@
   then look for a range between the lower, and upper limit of that time."
   [{{:keys [in-or-out original-time new-time date]} :opts}]
   (let [date-to-use (if date (LocalDate/parse date) (LocalDate/now))]
-    (helpers/amend-clock
-     @db
-     (= in-or-out "in")
-     (LocalDateTime/of date-to-use (LocalTime/parse original-time))
-     (LocalDateTime/of date-to-use (LocalTime/parse new-time))))
+    (try
+      (helpers/amend-clock
+       @db
+       (= in-or-out "in")
+       (LocalDateTime/of date-to-use (LocalTime/parse original-time))
+       (LocalDateTime/of date-to-use (LocalTime/parse new-time)))
+      (catch ExceptionInfo e
+        (error-and-quit (ex-message e)))))
+
   (println "Clock amended."))
 
 (defn- print-bullet-list
