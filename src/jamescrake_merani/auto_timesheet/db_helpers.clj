@@ -104,6 +104,16 @@
   [db]
   (map convert-clock (as-db/hanging-clockins db)))
 
+(defn clock-with-category
+  "Given a sequence `clocks`, find the clock which has `category`. If `category` is
+  nil, then just return the first clock. It is the caller's responsibility to
+  handle the case where `category` is nil."
+  [db clocks category]
+  (if (nil? category)
+    (first clocks)
+    (let [category-id (category-to-id db category true)]
+      (first (filter #(= (:categoryid %) category-id) clocks)))))
+
 (defn clock-out
   "Make a clock out. Without providing any arguments, the clock out will be
   attached to the last clock in, but you can optionally a specific clock in id.
