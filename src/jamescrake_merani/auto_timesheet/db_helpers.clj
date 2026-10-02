@@ -108,10 +108,10 @@
   "Given a sequence `clocks`, find the clock which has `category`. If `category`
   is nil, then just return the first clock. It is the caller's responsibility to
   validate the category."
-  [clocks category]
+  [db clocks category]
   (if (nil? category)
     (first clocks)
-    (let [category-id (category-to-id category true)]
+    (let [category-id (category-to-id db category true)]
       (first (filter #(= (:categoryid %) category-id) clocks)))))
 
 (defn clock-out

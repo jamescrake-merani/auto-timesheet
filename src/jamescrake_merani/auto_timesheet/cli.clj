@@ -85,7 +85,7 @@
         time-since-clockin (when (not (empty? hanging-clockins))
                              (:starttime (first hanging-clockins)))
         effective-datetime (get-effective-datetime time)
-        to-clock-out (helpers/clock-with-category hanging-clockins category)]
+        to-clock-out (helpers/clock-with-category @db hanging-clockins category)]
     (cond (empty? hanging-clockins)
           (error-and-quit "You are not clocked in.")
           ;; This check is a bit early, but the reason its here is because if
@@ -94,6 +94,7 @@
           ;; the category because the user might get confused when we've clocked
           ;; out of a clock in that wasn't of the category they specified.
           (and category (nil? to-clock-out))
+          ;; TODO: Exception in thread "main" java.lang.Exception: Category needs to be an id, or a name.
           (error-and-quit "The category you've specified does not have a hanging clock in associated with it.")
           (= (count hanging-clockins) 1)
           (helpers/clock-out @db effective-datetime)
