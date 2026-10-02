@@ -105,9 +105,9 @@
   (map convert-clock (as-db/hanging-clockins db)))
 
 (defn clock-with-category
-  "Given a sequence `clocks`, find the clock which has `category`. If `category`
-  is nil, then just return the first clock. It is the caller's responsibility to
-  validate the category."
+  "Given a sequence `clocks`, find the clock which has `category`. If `category` is
+  nil, then just return the first clock. It is the caller's responsibility to
+  handle the case where `category` is nil."
   [db clocks category]
   (if (nil? category)
     (first clocks)
