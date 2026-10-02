@@ -96,7 +96,7 @@
           (and category (nil? to-clock-out))
           ;; TODO: Exception in thread "main" java.lang.Exception: Category needs to be an id, or a name.
           (error-and-quit "The category you've specified does not have a hanging clock in associated with it.")
-          (and (nil? category) (= (count hanging-clockins) 1))
+          (and (nil? category) (> (count hanging-clockins) 1))
           (error-and-quit "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
           :else (helpers/clock-out @db (:clockinid to-clock-out) effective-datetime))
     (println (format "Clocked out. You have worked %s"
