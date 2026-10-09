@@ -105,7 +105,7 @@
           (error-and-quit "You have multiple clock ins. You must resolve this ambiguity by specifying a category (with the --category flag).")
           :else (helpers/clock-out @db (:clockinid to-clock-out) effective-datetime))
     (println (format "Clocked out. You have worked %s"
-                     (format-duration (Duration/between time-since-clockin (LocalDateTime/now)))))))
+                     (format-duration (Duration/between time-since-clockin effective-datetime))))))
 
 (defn get-category-to-use
   "Takes in an `input-category` (which may be nil), and outputs the one to use,
