@@ -342,6 +342,13 @@
         (print-bullet-list "Categories that exist in the database but aren't used in any clockins:"
                            unused-categories)))))
 
+(defn print-version
+  "Print the current version of auto-timesheet."
+  [_]
+  (let [^Package pkg (.getPackage (.getClass ^Object print-version))
+        version (when pkg (.getImplementationVersion pkg))]
+    (println "auto-timesheet" (or version "dev"))))
+
 (def table
   [{:cmds ["init-config"] :fn init-config :doc "Initialise the default configuration."}
    {:cmds ["clockin"] :fn clockin :doc "Make a clock in." :spec clock-spec}
@@ -354,6 +361,7 @@
    {:cmds ["directories"] :fn directories :doc "Show the directories of where the config, and database is stored."}
    {:cmds ["amend"] :fn amend :doc "Make an amendment to an existing clock in/out." :spec amend-spec}
    {:cmds ["all-categories"] :fn show-all-categories :doc "Show all of the categories in the database."}
+   {:cmds ["version"] :fn print-version :doc "Print the current version."}
    {:cmds [] :fn no-command :doc "Display the status."}])
 
 ;; TODO: Might only want to init the db for some commands later.
