@@ -25,7 +25,8 @@
          :class-dir class-dir
          :src-dirs ["src"]
          :ns-compile [main]
-         :manifest {"Enable-Native-Access" "ALL-UNNAMED"}))
+         :manifest {"Enable-Native-Access" "ALL-UNNAMED"
+                    "Implementation-Version" version}))
 
 (defn uberjar "Just build the uberjar" [opts]
   (b/delete {:path "target"})
