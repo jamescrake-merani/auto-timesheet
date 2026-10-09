@@ -3,7 +3,7 @@ ci:
 
 build:
     clj -T:build uberjar 
-    native-image --features=clj_easy.graal_build_time.InitClojureClasses -jar target/com.github.jamescrake-merani/auto-timesheet-*.jar -o target/auto-timesheet
+    native-image -march=native --features=clj_easy.graal_build_time.InitClojureClasses -jar target/com.github.jamescrake-merani/auto-timesheet-*.jar -o target/auto-timesheet
 
 test:
     clj -M:test
