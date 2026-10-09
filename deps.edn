@@ -17,3 +17,5 @@
   :test {:extra-paths ["test"]
          :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}}
          :main-opts ["-m" "kaocha.runner"]}}}
+         :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
+                      org.slf4j/slf4j-nop {:mvn/version "1.7.36"}}
