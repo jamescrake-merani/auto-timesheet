@@ -32,6 +32,11 @@
            (clojure.lang ExceptionInfo))
   (:gen-class))
 
+;; GraalVM can't handle reflection in Clojure. When running under the JVM, we
+;; want to know whether any relfection is happening, because it needs to... not
+;; happen.
+(set! *warn-on-reflection* true)
+
 (defn- error-and-quit [error-message]
   (do
     (.println ^java.io.PrintWriter *err* error-message)
