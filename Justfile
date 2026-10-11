@@ -16,3 +16,7 @@ test:
 build-docs:
     uvx --with mkdocs-autorefs mkdocs build
 
+[working-directory: 'manual']
+serve-docs:
+    uvx --with mkdocs-autorefs mkdocs serve
+
