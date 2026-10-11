@@ -6,6 +6,7 @@ When you first run auto-timesheet without any arguments, it will give you the cu
 
 ```txt
 > auto-timesheet
+You have clocked in 0 hours, 0 minutes today.
 You are not currently clocked in.
 Run 'auto-timesheet --help' for a list of all commands.
 ```
@@ -35,6 +36,7 @@ Now if we get the status again, we should see that we are clocked in.
 
 ```txt
 > auto-timesheet status
+You have clocked in 0 hours, 0 minutes today.
 You are currently clocked into work. 0 hours, 0 minutes elapsed since clockin.
 ```
 
@@ -55,7 +57,6 @@ The previous commands make entries based on what the current time is. That is us
 
 ```txt
 > auto-timesheet manual-entry --start-time 11:00 --end-time 13:00 --category work
-
 ```
 
 Note that you should write entry times in 24 hour format. If you need to make a manual entry that is on a different day, you'll need to specify the date parameter.
@@ -72,9 +73,9 @@ After using the clocking functionality, you'll probably want to see a summary of
 
 ```txt
 > auto-timesheet report -t human-readable
-Thursday:
+Thursday (2 hours, 0 minutes):
 11:00-13:00 (2 hours, 0 minutes)
-Friday:
+Friday (3 hours, 0 minutes):
 09:00-12:00 (3 hours, 0 minutes)
 Total work completed: 5 hours, 0 minutes
 ```
