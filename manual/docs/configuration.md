@@ -1,6 +1,6 @@
 # Configuration
 
-The program's user configuration file is stored in different locations depending on the operating system. The easiest way to check where you should be editing your config file is by running:
+The program's user configuration file is stored in different locations depending on the operating system. The easiest way to check where it should be editing your config file is by running:
 
 ```txt
 auto-timesheet directories
