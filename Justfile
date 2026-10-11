@@ -13,10 +13,9 @@ test:
     clj -M:test
 
 [working-directory: 'manual']
-build-docs:
-    uvx --with mkdocs-autorefs mkdocs build
+docs subcommand:
+    uvx --with mkdocs-autorefs mkdocs {{subcommand}}
 
-[working-directory: 'manual']
-serve-docs:
-    uvx --with mkdocs-autorefs mkdocs serve
+build-docs: (docs "build")
+serve-docs: (docs "serve")
 
