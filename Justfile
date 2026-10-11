@@ -12,3 +12,7 @@ build-native: build-jar
 test:
     clj -M:test
 
+[working-directory: 'manual']
+build-docs:
+    uvx --with mkdocs-autorefs mkdocs build
+
