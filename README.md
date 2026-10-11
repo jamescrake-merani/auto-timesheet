@@ -20,12 +20,25 @@ uvx --with mkdocs-autorefs mkdocs serve
 
 # Build Instructions
 
-This is a Clojure project, so you'll need to have **Clojure** installed alongside a **JDK**. Then run:
+This project uses a [Justfile](https://just.systems/man/en/), where you can find all the build commands. If you have `just` installed, the quickest way to build everything is to run
 
-```sh
-clj -T:build ci
+``` sh
+just build
 ```
 
-Which will run the tests, and (if successful) build the uberjar of this application.
+To run this command, you'll require
 
-While optional, its also recommended that you have use **GraalVM** for compiling a native image of the program. This is because the JVM has a long startup time, which is a bit problematic for a terminal-based application like auto-timesheet. A script is provided (`build_native_image.sh`) for doing this, which you can run after producing the uberjar from the previous step.
+- Clojure, and the Clojure CLI tools
+- A JDK with GraalVM (see below for building without)
+- Just
+
+This command will build a native executable for your operating system with GraalVM. GraalVM is recommended because the JVM has a long startup time (that is exacerbated by Clojure loading in _a lot_ of classes), which is a bit problematic for a CLI application like auto-timesheet.
+
+## Build without GraalVM
+
+If you'd prefer to build without GraalVM, and are willing to put up with the long JVM startup time, you can run
+
+```sh
+just build-jar
+```
+
