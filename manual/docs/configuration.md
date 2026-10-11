@@ -1,12 +1,18 @@
 # Configuration
 
-The program's configuration file is stored in different locations depending on the operating system. The easiest way to check where you should be editing your config file is by running:
+The program's user configuration file is stored in different locations depending on the operating system. The easiest way to check where you should be editing your config file is by running:
 
 ```txt
 auto-timesheet directories
 ```
 
-The config is stored as an EDN file. It is loaded, and merged with the default config. This means that if you do not specify a field in your config, the program will automatically revert to the default value.
+The program keeps a default internal configuration file. The default configuration is merged with the user configuration, with values in the user configuration taking priority. However, it is not necessary to specify all values. In fact, by default a configuration file is not even created automatically. If you'd like to create a configuration file with all the defaults, run:
+
+```txt
+auto-timesheet init-config
+```
+
+The config is stored as an EDN file. 
 
 ## Default category
 
